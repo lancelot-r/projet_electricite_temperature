@@ -1,0 +1,67 @@
+---
+title: "Untitled"
+output: html_document
+date: "2025-02-05"
+---
+
+```{r}
+library(dplyr)
+library(lubridate)
+library(readr)
+library(hms)
+library(zoo)
+```
+
+```{r}
+data <- read_delim("C:/Users/martc/OneDrive/Documents/M1SSD/sériest/household_power_consumption.txt", 
+                   delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+```
+
+```{r}
+data$Date <- as.Date(data$Date, format = "%d/%m/%Y")
+```
+
+```{r}
+data$Global_active_power=as.numeric(as.character(data$Global_active_power))
+data$Sub_metering_1=as.numeric(as.character(data$Sub_metering_1))
+data$Sub_metering_2=as.numeric(as.character(data$Sub_metering_2))
+data$Sub_metering_3=as.numeric(as.character(data$Sub_metering_3))
+data$watt <- 1000*data$Global_active_power/60-data$Sub_metering_1-data$Sub_metering_2-data$Sub_metering_3
+```
+
+
+
+```{r}
+data_janvier_2008 = data[format(data$Date, "%m/%Y") == "01/2008", ]
+```
+```{r}
+data_juin_2008 = data[format(data$Date, "%m/%Y") == "01/2008", ]
+```
+
+```{r}
+data_janvier_2008$Time <- as.POSIXct(data_janvier_2008$Time, format = "%H:%M:%S", origin = "2008-01-01")
+data_janvier_2008$Heure <- as.numeric(format(data_janvier_2008$Time, "%H"))
+data_janvier_2008 = select(data_janvier_2008, -Time)
+
+```
+
+
+```{r}
+data_janvier_2008 <- select(data_janvier_2008, Date, Heure, watt)
+```
+
+```{r}
+data_janvier_2008$Heure <- sprintf("%02d:00:00", data_janvier_2008$Heure)
+```
+
+```{r}
+data_janvier_2008$DateTime <- as.POSIXct(paste(data_janvier_2008$Date, data_janvier_2008$Heure), 
+                                          format = "%Y-%m-%d %H:%M:%S")
+```
+
+```{r}
+watt_par_heure <- data_janvier_2008 %>%
+  group_by(DateTime) %>%
+  summarise(watt_par_heure = mean(watt, na.rm = TRUE))
+```
