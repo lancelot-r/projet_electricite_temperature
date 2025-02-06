@@ -13,55 +13,45 @@ library(zoo)
 ```
 
 ```{r}
-data <- read_delim("C:/Users/martc/OneDrive/Documents/M1SSD/sériest/household_power_consumption.txt", 
-                   delim = ";", escape_double = FALSE, trim_ws = TRUE)
-
-```
-
-```{r}
-data$Date <- as.Date(data$Date, format = "%d/%m/%Y")
-```
-
-```{r}
-data$Global_active_power=as.numeric(as.character(data$Global_active_power))
-data$Sub_metering_1=as.numeric(as.character(data$Sub_metering_1))
-data$Sub_metering_2=as.numeric(as.character(data$Sub_metering_2))
-data$Sub_metering_3=as.numeric(as.character(data$Sub_metering_3))
-data$watt <- 1000*data$Global_active_power/60-data$Sub_metering_1-data$Sub_metering_2-data$Sub_metering_3
-```
-
-
-
-```{r}
-data_janvier_2008 = data[format(data$Date, "%m/%Y") == "01/2008", ]
-```
-```{r}
-data_juin_2008 = data[format(data$Date, "%m/%Y") == "01/2008", ]
-```
-
-```{r}
-data_janvier_2008$Time <- as.POSIXct(data_janvier_2008$Time, format = "%H:%M:%S", origin = "2008-01-01")
-data_janvier_2008$Heure <- as.numeric(format(data_janvier_2008$Time, "%H"))
-data_janvier_2008 = select(data_janvier_2008, -Time)
+data <- powerconsumption <- read.csv("~/M1SSD/projet_electricite_temperature/data/powerconsumption.csv", header=T)
 
 ```
 
 
 ```{r}
-data_janvier_2008 <- select(data_janvier_2008, Date, Heure, watt)
+data$conso=data$PowerConsumption_Zone1+data$PowerConsumption_Zone2+data$PowerConsumption_Zone3
 ```
 
 ```{r}
-data_janvier_2008$Heure <- sprintf("%02d:00:00", data_janvier_2008$Heure)
+df =data %>%
+  select(-PowerConsumption_Zone1, -PowerConsumption_Zone2, -PowerConsumption_Zone3)
 ```
 
 ```{r}
-data_janvier_2008$DateTime <- as.POSIXct(paste(data_janvier_2008$Date, data_janvier_2008$Heure), 
-                                          format = "%Y-%m-%d %H:%M:%S")
+df$Datetime <- as.POSIXct(df$Datetime, format="%m/%d/%Y %H:%M")
 ```
 
 ```{r}
-watt_par_heure <- data_janvier_2008 %>%
-  group_by(DateTime) %>%
-  summarise(watt_par_heure = mean(watt, na.rm = TRUE))
+df$date <- as.Date(df$Datetime, format="%d/%m/%Y", tz="Europe/Paris")
 ```
+
+```{r}
+df= df%>%
+  select(-Datetime)
+```
+
+```{r}
+new_dates <- c("2017-03-26 02:00:00", "2017-03-26 02:10:00", "2017-03-26 02:20:00", 
+               "2017-03-26 02:30:00", "2017-03-26 02:40:00", "2017-03-26 02:50:00")
+new_dates <- as.POSIXct(new_dates, format="%Y-%m-%d %H:%M:%S", tz="UTC")
+df$date[12109:12114] = new_dates
+```
+
+```{r}
+df <- df %>%
+  group_by(date) %>%
+  summarise(across(everything(), mean, na.rm = TRUE))
+```
+
+ 
+
