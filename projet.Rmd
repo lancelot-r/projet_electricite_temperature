@@ -2,6 +2,8 @@
 title: "Untitled"
 output: html_document
 date: "2025-02-05"
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r}
@@ -10,6 +12,8 @@ library(lubridate)
 library(readr)
 library(hms)
 library(zoo)
+library(forecast)
+library(tseries)
 ```
 
 ```{r}
@@ -31,6 +35,270 @@ df =data %>%
 df$Datetime <- as.POSIXct(df$Datetime, format="%m/%d/%Y %H:%M")
 ```
 
+#pour janvier
+
+```{r} 
+df_janvier <- df %>%
+  filter(month(Datetime) == 1) %>%
+  filter(minute((Datetime)) == 0) %>%
+  filter(day(Datetime) <= 20)
+
+```
+
+```{r}
+st_temp_janv=ts(df_janvier$Temperature, frequency = 24, start = c(1,1))
+plot.ts(st_temp_janv,
+        main="température en janvier",
+        xlab= "jour",
+        ylab="Température",
+        col="red",)
+for (i in 1:20) {
+  abline(v=i)
+}
+
+```
+
+```{r} 
+#Décomposition
+decomp_temp_janv <- decompose(st_temp_janv, type = "additive")
+
+# changer la taille du plot et de label. axis et main
+options(repr.plot.width=20, repr.plot.height = 20)
+par(cex.lab=2,
+    cex.axis=1.5, 
+    cex.main=2)
+
+# ploter la decomposition
+plot(decomp_temp_janv, col="#5A9AC7", lwd = 1.5)
+```
+
+```{r}
+# On modélise la tendance par moyenne mobile
+trend_ma=ma(st_temp_janv, 24)
+plot.ts(st_temp_janv)
+points(trend_ma, type='l', col='red', lwd=2, lty=2)
+```
+
+```{r}
+#On en déduit un premier estimateur de la composante saisonnière
+season=st_temp_janv-trend_ma
+season_hat <- numeric(24)
+for (i in 1:24) {
+  season_hat[i]=mean(season[cycle(season) == i], na.rm=TRUE)
+}
+season_hat=rep(season_hat, 20)
+season_hat=ts(season_hat, frequency = 24)
+plot.ts(season_hat, type='l')
+```
+
+```{r}
+plot.ts(st_temp_janv)
+points(trend_ma+season_hat, col='red', lwd=2, type = 'l', lty=2)
+```
+
+```{r}
+#on divise la série en une série train et une série test
+ trend_train<-ts(head(trend_ma,408), start=c(1,1),frequency=24) #training
+ trend_test<-ts(tail(trend_ma,72), start=c(18,1),frequency=24) #test set
+ plot(trend_train,lty=1,xlim=c(1,22),
+ main="CSV USA deaths : training set/test set (black/blue)")
+ lines(trend_test, col="blue")
+```
+
+
+```{r}
+t<-seq(1,18-1/24,1/24)
+df2=as.data.frame(c(trend_train))
+df2=cbind(df2,t)
+ lm1<-lm(df2$`c(trend_train)`~t) #ajustementlinéaire
+ lm2<-lm(df2$`c(trend_train)`~t+I(t^2)) #ajustementquadratique
+ lm3<-lm(df2$`c(trend_train)`~t+I(t^2)+I(t^3)) #ajustementpolydegré3
+ #les R^2:
+ c(summary(lm1)$r.squared,summary(lm2)$r.squared,
+ summary(lm3)$r.squared)
+ c(summary(lm1)$adj.r.squared,summary(lm2)$adj.r.squared,
+ summary(lm3)$adj.r.squared)
+```
+```{r}
+plot(trend_train, type = "l", col = "black", pch = 16, main = "Série trend_train avec courbes de régression", 
+     xlab = "Temps", ylab = "Valeur de la tendance", lwd = 1.5, ylim=c(0,30), xlim=c(1,20))
+# Ajouter les courbes de régression
+lines(lm1$coefficients[1]+t*lm1$coefficients[2], col = "red", lwd = 2)
+#pred2 <- ts(predict(lm2), frequency = 24, start = c(18,1))
+lines(lm2$coefficients[1]+t*lm2$coefficients[2]+lm2$coefficients[3]*t^2, col = "green", lwd = 2) 
+lines(lm3$coefficients[1]+t*lm3$coefficients[2]+lm3$coefficients[3]*t^2+lm3$coefficients[4]*t^3, col = "purple", lwd = 2)
+lines(t,rep(1,length(t)))
+```
+
+```{r}
+plot(lm3$coefficients[1], xlim=c(0,20), ylim=c(-10,10) )
+```
+
+```{r}
+season_diff_2=diff(st_temp_janv, lag=24, differences = 2)
+plot.ts(season_diff_1)
+```
+
+```{r}
+bb=st_temp_janv-season_diff_2-trend_ma
+Box.test(bb, lag = 20)
+```
+
+
+
+<!-- #pour février -->
+
+<!-- ```{r}  -->
+<!-- df_fevrier <- df %>% -->
+<!--   filter(month(Datetime) <= 2) %>% -->
+<!--   filter(hour(Datetime) %% 2 == 0) %>% -->
+<!--   filter(minute((Datetime)) == 0) -->
+
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- st_temp_fev=ts(df_fevrier$Temperature, frequency = 12, start = c(1,1)) -->
+<!-- plot.ts(st_temp_fev, -->
+<!--         main="température en février", -->
+<!--         xlab= "jour", -->
+<!--         ylab="Température", -->
+<!--         col="red",) -->
+
+
+<!-- ``` -->
+
+<!-- ```{r}  -->
+<!-- #Décomposition -->
+<!-- decomp_temp_fev <- decompose(st_temp_fev, type = "additive") -->
+
+<!-- # changer la taille du plot et de label. axis et main -->
+<!-- options(repr.plot.width=20, repr.plot.height = 20) -->
+<!-- par(cex.lab=2, -->
+<!--     cex.axis=1.5,  -->
+<!--     cex.main=2) -->
+
+<!-- # ploter la decomposition -->
+<!-- plot(decomp_temp_fev, col="#5A9AC7", lwd = 1.5) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- # On modélise la tendance par moyenne mobile -->
+<!-- trend_ma=ma(st_temp_fev, 24) -->
+<!-- plot.ts(st_temp_janv) -->
+<!-- points(trend_ma, type='l', col='red', lwd=2, lty=2) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- #On en déduit un premier estimateur de la composante saisonnière -->
+<!-- season=st_temp_janv-trend_ma -->
+<!-- season_hat <- numeric(12) -->
+<!-- for (i in 1:12) { -->
+<!--   season_hat[i]=mean(season[cycle(season) == i], na.rm=TRUE) -->
+<!-- } -->
+<!-- season_hat=rep(season_hat, 30) -->
+<!-- season_hat=ts(season_hat, frequency = 12) -->
+<!-- plot.ts(season_hat, type='l') -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- plot.ts(st_temp_janv) -->
+<!-- points(trend_ma+season_hat, col='red', lwd=2, type = 'l', lty=2) -->
+<!-- ``` -->
+
+<!-- plot(trend_ma) -->
+
+#pour mars
+
+```{r} 
+df_mars <- df %>%
+  filter(month(Datetime) == 3) %>%
+  filter(hour(Datetime) %% 2 == 0) %>%
+  filter(minute((Datetime)) == 0) %>%
+  filter(day(Datetime) <= 10)
+```
+
+```{r}
+st_temp_mars=ts(df_mars$Temperature, frequency = 12)
+plot.ts(st_temp_mars,
+        main="température en mars",
+        xlab= "jour",
+        ylab="Température",
+        col="red",)
+for (i in 1:31) {
+  abline(v=i)
+}
+
+```
+
+```{r}
+decomp_temp_mars <- decompose(st_temp_mars, type = "additive")
+
+options(repr.plot.width=20, repr.plot.height = 20)
+par(cex.lab=2,
+    cex.axis=1.5, 
+    cex.main=2)
+
+plot(decomp_temp_mars, col="#5A9AC7", lwd = 1.5)
+```
+
+#pour juin
+
+```{r} 
+df_juin <- df %>%
+  filter(month(Datetime) == 6) %>%
+  filter(hour(Datetime) %% 2 == 0) %>%
+  filter(minute((Datetime)) == 0) %>%
+  filter(day(Datetime) <= 10)
+```
+
+```{r}
+st_temp_juin=ts(df_juin$Temperature, frequency = 12)
+plot.ts(st_temp_juin,
+        main="température en juin",
+        xlab= "jour",
+        ylab="Température",
+        col="red",)
+for (i in 1:31) {
+  abline(v=i)
+}
+
+```
+
+```{r}
+decomp_temp_juin <- decompose(st_temp_janv, type = "additive")
+
+options(repr.plot.width=20, repr.plot.height = 20)
+par(cex.lab=2,
+    cex.axis=1.5, 
+    cex.main=2)
+
+plot(decomp_temp_juin, col="#5A9AC7", lwd = 1.5)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#################### au cas où ####################
 ```{r}
 df$date <- as.Date(df$Datetime, format="%d/%m/%Y", tz="Europe/Paris")
 ```
@@ -52,6 +320,9 @@ df <- df %>%
   group_by(date) %>%
   summarise(across(everything(), mean, na.rm = TRUE))
 ```
+```{r}
+temps_ts <- ts(data$Temperature, frequency = 1)
+```
 
- 
+ plot.ts(temps_ts)
 
