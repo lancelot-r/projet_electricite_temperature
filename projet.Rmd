@@ -46,7 +46,7 @@ df_janvier <- df %>%
 ```
 
 ```{r}
-st_temp_janv=ts(df_janvier$Temperature, frequency = 24, start = c(1,1))
+st_temp_janv=ts(df_janvier$Temperature, frequency = 24, start = c(1,0))
 plot.ts(st_temp_janv,
         main="température en janvier",
         xlab= "jour",
@@ -105,26 +105,25 @@ points(trend_ma+season_hat, col='red', lwd=2, type = 'l', lty=2)
  lines(trend_test, col="blue")
 ```
 
+```{r}
+trend_train=trend_train[-(1:12)]
+```
+
+
+
 
 ```{r}
-t<-seq(1,18-1/24,1/24)
-df2=as.data.frame(c(trend_train))
-df2=cbind(df2,t)
- lm1<-lm(df2$`c(trend_train)`~t) #ajustementlinéaire
- lm2<-lm(df2$`c(trend_train)`~t+I(t^2)) #ajustementquadratique
- lm3<-lm(df2$`c(trend_train)`~t+I(t^2)+I(t^3)) #ajustementpolydegré3
- #les R^2:
- c(summary(lm1)$r.squared,summary(lm2)$r.squared,
- summary(lm3)$r.squared)
- c(summary(lm1)$adj.r.squared,summary(lm2)$adj.r.squared,
- summary(lm3)$adj.r.squared)
+t<-seq(1+12/24,18-1/24,1/24)
+lm1=lm(trend_train~t)
+lm2=lm(trend_train~poly(t, 2, raw=TRUE))
+lm3=lm(trend_train~poly(t,3, raw=TRUE))
 ```
+
 ```{r}
-plot(trend_train, type = "l", col = "black", pch = 16, main = "Série trend_train avec courbes de régression", 
+plot(trend_ma, type = "l", col = "black", pch = 16, main = "Série trend_train avec courbes de régression", 
      xlab = "Temps", ylab = "Valeur de la tendance", lwd = 1.5, ylim=c(0,30), xlim=c(1,20))
 # Ajouter les courbes de régression
 lines(lm1$coefficients[1]+t*lm1$coefficients[2], col = "red", lwd = 2)
-#pred2 <- ts(predict(lm2), frequency = 24, start = c(18,1))
 lines(lm2$coefficients[1]+t*lm2$coefficients[2]+lm2$coefficients[3]*t^2, col = "green", lwd = 2) 
 lines(lm3$coefficients[1]+t*lm3$coefficients[2]+lm3$coefficients[3]*t^2+lm3$coefficients[4]*t^3, col = "purple", lwd = 2)
 lines(t,rep(1,length(t)))
