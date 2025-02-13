@@ -1,0 +1,174 @@
+---
+title: "Untitled"
+output: html_document
+date: "2025-02-05"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(dplyr)
+library(lubridate)
+library(readr)
+library(hms)
+library(zoo)
+library(forecast)
+library(tseries)
+```
+
+```{r}
+# Importation des données
+
+data <- read.csv("~/github/projet_electricite_temperature/data/powerconsumption.csv", header=T)
+```
+
+
+```{r}
+# Rassemblement des données des 3 centrales en une variable "conso"
+
+data$conso = 
+  data$PowerConsumption_Zone1+
+  data$PowerConsumption_Zone2+
+  data$PowerConsumption_Zone3
+```
+
+```{r}
+# Suppression des variables inutiles
+
+data = data %>%
+  select(-PowerConsumption_Zone1, -PowerConsumption_Zone2, -PowerConsumption_Zone3, -Humidity, -WindSpeed, -GeneralDiffuseFlows, -DiffuseFlows)
+```
+
+```{r}
+# Modification du format de date pour faciliter la manipulation
+
+data$Datetime <- as.POSIXct(data$Datetime, format="%m/%d/%Y %H:%M")
+```
+
+#pour janvier
+
+```{r}
+# Creation d'une df pour le mois de Janvier (20 premiers jours)
+
+data_janvier <- data %>%
+  filter(month(Datetime) == 1) %>%
+  filter(minute((Datetime)) == 0) %>%
+  filter(day(Datetime) <= 20)
+```
+
+```{r}
+# Creation de la série temporelle pour la température (toutes les heures, départ 01/01 à 00:00 et fin le 20/01 à 23:00)
+
+ts_janvier = ts(data_janvier$Temperature, frequency = 24, start = c(1,1))
+
+plot.ts(ts_janvier,
+        main="température en janvier",
+        xlab= "jour",
+        ylab="Température",
+        col="red",)
+for (i in 1:21) {
+  abline(v=i)
+}
+```
+
+```{r} 
+# Décomposition
+decomp_temp_janv <- decompose(st_temp_janv, type = "additive")
+
+# changer la taille du plot et de label. axis et main
+options(repr.plot.width=20, repr.plot.height = 20)
+par(cex.lab=2,
+    cex.axis=1.5, 
+    cex.main=2)
+
+# ploter la decomposition
+plot(decomp_temp_janv, col="#5A9AC7", lwd = 1.5)
+```
+
+```{r}
+# Décompositions additive et multiplicative de notre série temporelle
+
+decompose_additive <- decompose(ts_janvier, type = "additive")
+decompose_multiplicative <- decompose(ts_janvier, type = "multiplicative")
+
+# Affichage des graphiques
+plot(decompose_additive)
+plot(decompose_multiplicative)
+
+# Nous choisirons l'additive car les variations saisonnières restent constantes au fil du temps
+```
+
+```{r}
+# Extraction de la trend
+trend_temperature <- decompose_additive$trend
+# La trend ne semble pas suivre une ligne droite, nous allons donc tester les modèles polynomiaux et le lissage exponentiel
+```
+
+```{r}
+# Creation d'un index temporel et d'une dataframe avec la trend
+time_index <- 1:length(trend_temperature)
+df_trend <- data.frame(time = time_index, trend = trend_temperature)
+```
+
+```{r}
+library(forecast)
+
+# Ajustement des modèles :
+lm_trend = lm(trend ~ time, data = df_trend) # Modèle linéaire
+lm_poly4_trend = lm(trend ~ poly(time, 4), data = df_trend)  # Modèle quadratique 4
+lm_poly7_trend = lm(trend ~ poly(time, 7), data = df_trend)  # Modèle quadratique 7
+
+# Représentation du modèle polynomial : 
+plot(trend_temperature, type="l", main="Modélisation de la tendance")
+lines(predict(lm_trend), col="red", lwd=2)
+lines(predict(lm_poly4_trend), col="purple", lwd=2)
+lines(predict(lm_poly7_trend), col="blue", lwd=2)
+```
+
+```{r}
+# Test lissage exponentiel
+ets_trend_simple <- ets(trend_temperature, model="AAN") # Lissage exponentiel simple
+ets_trend <- ets(trend_temperature, model="ANN") # Lissage exponentiel
+
+plot(trend_temperature, type="l", main="Modélisation de la tendance (poly)")
+lines(fitted(ets_trend), col="green", lwd=2)
+lines(fitted(ets_trend_simple), col="red", lwd=2)
+```
+
+# Sezonaite
+```{r}
+# Extraction de la season
+season_temperature <- decompose_additive$seasonal
+plot(season_temperature, type="l", main="Modélisation de la season")
+
+# On voit bien que la saissonalité se répète toutes les 24h
+```
+
+```{r}
+seasonal_avg <- tapply(season_temperature, rep(1:24, length.out=length(season_temperature)), mean)
+plot(seasonal_avg, type="o", col="red", main="Moyenne des effets saisonniers par heure")
+
+# Logique pour un mois de janvier dans le sud du Maroc ...
+```
+
+```{r}
+# Modèle linéaire avec variables indicatrices pour chaque heures
+
+time_index <- 1:length(ts_janvier)
+hour_factor <- as.factor(rep(1:24, length.out=length(ts_janvier)))
+
+df_season <- data.frame(time = time_index, temp = ts_janvier, hour = hour_factor)
+
+# Régression linéaire avec les variables horaires
+lm_seasonal <- lm(temp ~ hour, data=df_season)
+
+# Affichage des coefficients (effets saisonniers)
+summary(lm_seasonal)
+
+plot(season_temperature, main="Moyenne des effets saisonniers par heure")
+plot(fitted(lm_seasonal), col="red", type = "l", lwd=2)
+```
+
+
+
+
