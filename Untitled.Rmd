@@ -1,0 +1,112 @@
+---
+title: "Untitled"
+author: "Lancelot Ravier"
+date: "2025-02-17"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(dplyr)
+library(lubridate)
+library(readr)
+library(hms)
+library(zoo)
+library(forecast)
+library(tseries)
+```
+
+```{r}
+# Importation des données
+
+data <- read.csv("~/github/projet_electricite_temperature/data/powerconsumption.csv", header=T)
+```
+
+
+```{r}
+# Rassemblement des données des 3 centrales en une variable "conso"
+
+data$conso = 
+  data$PowerConsumption_Zone1+
+  data$PowerConsumption_Zone2+
+  data$PowerConsumption_Zone3
+```
+
+```{r}
+# Suppression des variables inutiles
+
+data = data %>%
+  select(-PowerConsumption_Zone1, -PowerConsumption_Zone2, -PowerConsumption_Zone3, -Humidity, -WindSpeed, -GeneralDiffuseFlows, -DiffuseFlows)
+```
+
+```{r}
+# Modification du format de date pour faciliter la manipulation
+
+data$Datetime <- as.POSIXct(data$Datetime, format="%m/%d/%Y %H:%M")
+```
+
+#pour janvier
+
+```{r}
+# Creation d'une df pour le mois de Janvier (20 premiers jours)
+# Remplacer le code par window()
+data_janvier <- data %>%
+  filter(month(Datetime) == 1) %>%
+  filter(minute((Datetime)) == 0) %>%
+  filter(day(Datetime) <= 20)
+```
+
+```{r}
+# Creation de la série temporelle pour la température (toutes les heures, départ 01/01 à 00:00 et fin le 20/01 à 23:00)
+
+ts_janvier = ts(data_janvier$Temperature, frequency = 24, start = c(1,1))
+
+plot.ts(ts_janvier,
+        main="température en janvier",
+        xlab= "jour",
+        ylab="Température",
+        col="red",)
+for (i in 1:21) {
+  abline(v=i)
+}
+```
+
+```{r}
+par(mfrow = c(2,1))
+acf(ts_janvier, lag.max = 96)
+pacf(ts_janvier, lag.max = 24)
+```
+
+```{r}
+par(mfrow = c(2,1))
+acf(diff(ts_janvier, difference = 1), lag.max = 300)
+pacf(diff(ts_janvier, difference = 1), lag.max = 96)
+```
+
+On choisit difference = 3 donc ARIMA(p,3,q) car d = 3 permet de rendre la série stationnaire.
+
+(il faut modéliser la trend avec deecompose et montrer que le degre 3 la modelise le mieux)
+
+```{r}
+par(mfrow = c(2,1))
+model = arima(ts_janvier, seasonal = list(order = c(1, 0, 0), period = 24), method='ML', include.drift = T)
+```
+
+Pour l'ACF, on voit que les significativités deviennent nulles au lag q = 1 donc ACF(1, 3, p)
+
+```{r}
+acf(model$residuals, lag.max = 96)
+pacf(model$residuals, lag.max = 96)
+```
+
+On va essayer de recuperer le coefficient d'auto-regression en faisant la regression linéaire suivante : lm(ln(\rho(h)) ~ln(h))
+
+```{r}
+acf_values <- acf(model$residuals, lag.max = 96, plot = FALSE)$acf
+ln_rho <- log(acf_values)
+ln_h <- log(1:length(acf_values))
+model_rho <- lm(ln_rho ~ ln_h)
+summary(model_rho)
+```
+

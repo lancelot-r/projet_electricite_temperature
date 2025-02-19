@@ -1,0 +1,258 @@
+---
+title: "Untitled"
+output:
+  pdf_document: default
+  html_document: default
+date: "2025-02-05"
+editor_options:
+  chunk_output_type: inline
+---
+
+```{r}
+library(dplyr)
+library(lubridate)
+library(readr)
+library(hms)
+library(zoo)
+library(forecast)
+library(tseries)
+```
+
+```{r}
+# Importation des données
+
+data <- read.csv("~/github/projet_electricite_temperature/data/powerconsumption.csv", header=T)
+```
+
+
+```{r}
+# Rassemblement des données des 3 centrales en une variable "conso"
+
+data$conso = 
+  data$PowerConsumption_Zone1+
+  data$PowerConsumption_Zone2+
+  data$PowerConsumption_Zone3
+```
+
+```{r}
+# Suppression des variables inutiles
+
+data = data %>%
+  select(-PowerConsumption_Zone1, -PowerConsumption_Zone2, -PowerConsumption_Zone3, -Humidity, -WindSpeed, -GeneralDiffuseFlows, -DiffuseFlows)
+```
+
+```{r}
+# Modification du format de date pour faciliter la manipulation
+
+data$Datetime <- as.POSIXct(data$Datetime, format="%m/%d/%Y %H:%M")
+```
+
+#Pour aout
+
+```{r}
+# Creation d'une df pour le mois d'Aout (20 premiers jours)
+
+data_ete <- data %>%
+  filter(month(Datetime) == 7 | month(Datetime) == 8) %>%
+  filter(minute((Datetime)) == 0) %>%
+  filter(day(Datetime) <= 31)
+```
+
+```{r}
+# Convertir les limites en objets POSIXct
+xlim_start <- as.POSIXct("2017-07-30 16:00:00")
+xlim_end <- as.POSIXct("2017-07-31 15:00:00")
+
+par(mfrow = c(1, 2))
+# Tracer le graphique avec xlim correctement défini
+plot(data_ete$Datetime, data_ete$Temperature, col = "red", type = "l", 
+     xlim = c(xlim_start, xlim_end),
+     xlab = "Temps", ylab = "Consommation électrique", 
+     main = "Temperature")
+
+plot(data_ete$Datetime, data_ete$conso, col = "red", type = "l", 
+     xlim = c(xlim_start, xlim_end),
+     xlab = "Temps", ylab = "Consommation électrique", 
+     main = "Consommation électrique")
+```
+
+```{r}
+# Creation de la série temporelle pour la température
+
+ts_temp = ts(data_ete$Temperature, frequency = 24, start = c(1,1))
+
+plot.ts(ts_temp,
+        main="Température pour la période juillet-aout",
+        xlab= "jour",
+        ylab="Température",
+        col="red")
+for (i in 1:63) {
+  abline(v=i)
+}
+```
+
+```{r}
+# Desaissonaliser la série
+decompose_temp = decompose(ts_temp)
+
+ts_temp_deseason = ts_temp - decompose_temp$seasonal
+mean(ts_temp_deseason) # 26.47263
+```
+
+```{r}
+plot.ts(ts_temp_deseason,
+        main="Serie temporelle soustraite de season",
+        xlab= "jour",
+        ylab="Température",
+        col="red")
+```
+
+```{r}
+t<-1:1488
+t1<-ts(t,start=c(1,1),freq=24)
+t2<-ts(t^2,start=c(1,1),freq=24)
+t3<-ts(t^3,start=c(1,1),freq=24)
+t4<-ts(t^4,start=c(1,1),freq=24)
+t5<-ts(t^5,start=c(1,1),freq=24)
+t6<-ts(t^6,start=c(1,1),freq=24)
+t7<-ts(t^6,start=c(1,1),freq=24)
+t8<-ts(t^6,start=c(1,1),freq=24)
+t9<-ts(t^6,start=c(1,1),freq=24)
+t10<-ts(t^6,start=c(1,1),freq=24)
+
+lm1 = lm(ts_temp_deseason~t1)
+lm2 = lm(ts_temp_deseason~t1+t2)
+lm3 = lm(ts_temp_deseason~t1+t2+t3)
+lm4 = lm(ts_temp_deseason~t1+t2+t3+t4)
+lm5 = lm(ts_temp_deseason~t1+t2+t3+t4+t5)
+lm6 = lm(ts_temp_deseason~t1+t2+t3+t4+t5+t6)
+lm7 = lm(ts_temp_deseason~t1+t2+t3+t4+t5+t6+t7)
+lm8 = lm(ts_temp_deseason~t1+t2+t3+t4+t5+t6+t7+t8)
+lm9 = lm(ts_temp_deseason~t1+t2+t3+t4+t5+t6+t7+t8+t9)
+lm10 = lm(ts_temp_deseason~t1+t2+t3+t4+t5+t6+t7+t8+t9+t10)
+```
+
+```{r}
+temp_rsq = as.vector(c(summary(lm1)$adj.r.squared,
+        summary(lm2)$adj.r.squared,
+        summary(lm3)$adj.r.squared,
+        summary(lm4)$adj.r.squared,
+        summary(lm5)$adj.r.squared,
+        summary(lm6)$adj.r.squared,
+        summary(lm7)$adj.r.squared,
+        summary(lm8)$adj.r.squared,
+        summary(lm9)$adj.r.squared,
+        summary(lm10)$adj.r.squared))
+
+par(mfrow = c(1,2))
+plot(temp_rsq, type = "s", col = "blue", ylim = c(0, 1), xlim = c(1,10), xlab = "models", ylab = "R2-adjusted")
+plot(temp_rsq, type = "s", col = "blue", ylim = c(0.2723, 0.2726), xlim = c(4.5,6.5), xlab = "models", ylab = "R2-adjusted")
+
+par(mfrow=c(1,1))
+plot.ts(ts_temp_deseason)
+lines(predict(lm1), col = "blue", )
+lines(predict(lm2), col = "purple")
+lines(predict(lm5), col = "red")
+lines(predict(lm6), col = "green")
+```
+```{r}
+par(mfrow=c(3,1))
+acf(ts_temp_deseason - lm1$fitted.values, main="serie1 csv - lm1", lag.max = 192)
+acf(ts_temp_deseason - lm2$fitted.values, main="serie1 csv - lm2", lag.max = 192)
+acf(ts_temp_deseason - lm5$fitted.values, main="serie1 csv - lm5", lag.max = 192)
+```
+
+
+```{r}
+# Calcul de la série résiduelle :
+
+res_ts_temp = ts_temp_deseason - lm2$fitted.values
+pvalBox = Box.test(res_ts_temp, type="Ljung")
+par(mfrow=c(1,2))
+acf(res_ts_temp, main="serie1 csv - est. tend.", lag.max = 96)
+pacf(res_ts_temp)
+```
+A partir de l'ACF, on voit bien que la décroissance est lente, ce qui nous pousse à modéliser par MA(q) sans savoir la valeur exacte du paramètre. De plus, la forme sinusoidale de l'ACF montrerait une saissonalité avec une périodicité de 24h (le même pattern se reitère à chaque lag). Ainsi, nous choisirons aussi des termes MA saissoniers (Q).
+A partir du PACF, nous voyons que le premier lag est significatif. Ainsi, nous allons modéliser par AR(p=1).
+
+
+```{r}
+adf.test(res_ts_temp)
+kpss.test(res_ts_temp)
+```
+
+La série est stationnaire donc on ne fera pas de différenciation dans notre modèle.
+
+```{r}
+ar_model_1 = arima(res_ts_temp, order = c(1, 0, 0))
+arima_model_1 = arima(res_ts_temp, order = c(1, 0, 1), seasonal = list(order = c(0, 0, 1), period = 24))
+arima_model_2 = arima(res_ts_temp, order = c(1, 0, 2), seasonal = list(order = c(0, 0, 2), period = 24))
+arima_model_3 = arima(res_ts_temp, order = c(1, 0, 3), seasonal = list(order = c(0, 0, 3), period = 24))
+
+par(mfrow=c(2,2))
+acf(ar_model_1$residuals)
+pacf(ar_model_1$residuals)
+acf(ar_model_2$residuals)
+pacf(ar_model_2$residuals)
+```
+```{r}
+Box.test(ar_model_1$residuals, type="Ljung")
+Box.test(arima_model_1$residuals, type="Ljung")
+Box.test(arima_model_2$residuals, type="Ljung")
+Box.test(arima_model_3$residuals, type="Ljung")
+```
+On voit que les résidus de nos deux modèles ne sont qu'un bruit blanc. Cependant, il est nécessaire de choisir lequel des deux modèles proposés nous allons garder. Pour ce faire, nous allons nous baser sur le critère d'Akaïke (AIC).
+
+```{r}
+print(c(ar_model_1$aic, arima_model_1$aic, arima_model_2$aic, arima_model_3$aic))
+```
+
+Nous allons donc choisir le modèle $\text{ARIMA}(1,0,2)(0,0,2)[24]$. Ce modèle inclut un terme AR d'ordre 1 et deux termes MA non saisonniers pour capturer la dépendance à court terme, ainsi que deux termes MA saisonniers pour modéliser la saisonnalité quotidienne. Les résidus du modèle sont un bruit blanc, ce qui confirme que le modèle est bien ajusté.
+
+Maintenant, utilisons la fonction auto.arima afin de verifier si le modèle choisi analytiquement correspond bien au modèle choisi par l'algorithme : 
+
+```{r}
+auto_arima_temp = auto.arima(res_ts_temp, stationary = T, seasonal = T)
+auto_arima_temp
+```
+
+```{r}
+residus_arima <- residuals(auto_arima_temp)
+plot(residus_arima, main = "Résidus du modèle ARIMA")
+```
+```{r}
+acf(residus_arima, main = "ACF des résidus")
+pacf(residus_arima, main = "PACF des résidus")
+```
+
+```{r}
+Box.test(residus_arima, type = "Ljung-Box")
+```
+```{r}
+hist(residus_arima, breaks = 30, main = "Histogramme des résidus", probability = TRUE)
+lines(density(residus_arima), col = "red")
+```
+```{r}
+plot(fitted(auto_arima_temp), residus_arima, main = "Résidus vs Valeurs ajustées", xlab = "Valeurs ajustées", ylab = "Résidus")
+abline(h = 0, col = "red")
+library(lmtest)
+bptest(residus_arima ~ fitted(auto_arima_temp))
+```
+
+```{r}
+par(mfrow = c(1,2))
+plot(residus_arima, main="Résidus du modèle ARIMA", ylab="Résidus", xlab="Temps")
+abline(h=0, col="red")
+
+fitted_values <- fitted(auto_arima_temp)
+plot(fitted_values, residus_arima, main="Résidus vs Valeurs Ajustées", 
+     xlab="Valeurs Ajustées", ylab="Résidus")
+abline(h=0, col="red")
+
+```
+```{r}
+library(tseries)
+arch.test <- arch.test(auto_arima_temp)
+arch.test
+```
+

@@ -1,0 +1,216 @@
+---
+title: "Examen 2020-21"
+author: "Frédérique Leblanc"
+date: "27/01/2022"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+# theme du html document 
+#cerulean, journal, flatly, darkly, readable, spacelab, united, cosmo, lumen, paper, sandstone, simplex, and yeti
+knitr::opts_chunk$set(echo = TRUE)
+options(width = 80)
+library(readxl)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(corrplot)
+library(knitr)
+library(plotly)
+library(gridExtra)
+library(performance)
+library(forecast)
+library(tseries)
+```
+
+## Chargement de la série - Période de l'effet saisonnier 
+
+
+
+
+```{r}
+
+scan("seriet1.txt")->seriet1;mean(seriet1);sd(seriet1)
+
+plot.ts(seriet1)
+```
+
+```{r}
+par(mfrow=c(1,1))
+acf(seriet1,main="d inconnu et T=4")
+```
+
+Période $T=4$  claire on peut construire les objets
+au format ts : la série de valeurs etudiée et les séries de régresseurs utiles pour l'ajustement par un polynôme
+
+```{r}
+ts(seriet1,start=c(1975,1),frequency=4)->ts1
+t<-1:180
+t1<-ts(t,start=c(1975,1),freq=4)
+t2<-ts(t*t,start=c(1975,1),freq=4)
+t3<-ts(t^3,start=c(1975,1),freq=4)
+par(mfrow=c(1,1))
+acf(ts1)
+decompose(ts1)$figure
+```
+
+Mêmes graphiques que précédemment mais attention à la légende en abscisse
+qui change. Dans le cas d'une série au format ts Lag=1 correspond 
+à $h=T$....
+
+
+
+## Serie 1
+
+Désaisonnalistion puis ajustement paramétrique polynomial de la tendance 
+
+```{r}
+
+
+plot(decompose(ts1))
+ts1_csv<-ts1-decompose(ts1)$seasonal;mean(ts1) #serie sans saison
+plot(decompose(ts1_csv))
+lm(ts1~t1)->lm1        #ajustement linéaire avec serie brute (y compris saison)
+lm(ts1_csv~t1)->lm1_csv  #ajustement linéaire avec série sans saison
+c(summary(lm1)$adj.r.squared,summary(lm1_csv)$adj.r.squared)
+```
+
+Bien meilleur fit sur série désaisonnalisée
+
+```{r}
+lm(ts1_csv~t1+t2)->lm2_csv
+lm(ts1_csv~t1+t2+t3)->lm3_csv
+c(summary(lm1_csv)$adj.r.squared,summary(lm2_csv)$adj.r.squared,summary(lm3_csv)$adj.r.squared)
+```
+Valeur de k choisie : le plus petit donnant le meileur $R^2_{adj.}$ à $10^{-2}$ : Ici $k=2$
+
+
+## Estimation tendance et saisonnalité
+
+### Tendance et 4 premiers coeffs saisonniers :
+
+```{r}
+lm2_csv$coefficients
+# summary(lm2_csv)
+decompose(ts1)$figure
+```
+
+### Sur série filtrée par soustraction de l'estimation :
+
+On la note $y_t=x_t-(\hat{f}_t+\hat{s}_t)$.
+
+```{r}
+ts1r<-ts1_csv-lm2_csv$fitted.values
+pB<-Box.test(ts1r,type="Ljung")$p.value;pB
+par(mfrow=c(1,2))
+acf(ts1r,main="serie1 csv - est. tend."); pacf(ts1r)
+text(3,0.3,paste("pval BL=",round(pB,3)))
+```
+
+Quels ordres pour AR(p) et MA(q)
+
+Ici p=4 et q=4
+
+```{r}
+ar4<-Arima(ts1r,order=c(4,0,0))
+ar3<-Arima(ts1r,order=c(3,0,0))
+ar2<-Arima(ts1r,order=c(2,0,0))
+c(ar2$aic,ar3$aic,ar4$aic)
+```
+
+```{r}
+ma4<-Arima(ts1r,order=c(0,0,4))
+ma3<-Arima(ts1r,order=c(0,0,3))
+ma2<-Arima(ts1r,order=c(0,0,2))
+c(ma2$aic,ma3$aic,ma4$aic)           
+```
+Ici  parmi les 3 AR et les 3 MA on retiendra AR(4) qui a l'AIC le plus bas.
+
+Essayer les  ARMA(p,q) tels que  $p+q=4$
+
+```{r}
+arma22<-Arima(ts1r,order=c(2,0,2))
+arma31<-Arima(ts1r,order=c(3,0,1))
+arma13<-Arima(ts1r,order=c(1,0,3))
+c(ar4$aic,ma4$aic,arma22$aic,arma31$aic,arma13$aic)
+```
+
+Retenir le meilleur modèle parmi ceux tels que $p+q=4$ : ici ARMA(2,2)
+
+Valider ses résidus :
+
+```{r}
+#checkresiduals(arma22)
+par(mfrow=c(1,2))
+acf(arma22$residuals);pacf(arma22$residuals)
+Box.test(arma22$residuals,type="Ljung")$p.value->pB
+text(3,0.1,paste("pval BL=",round(pB,3)))
+
+```
+
+Résidus Ok et vraiment plus rien à en tirer étant donné la pval de 87.5% du test de blancheur de Box-Ljung.
+
+
+## Prévisions serie1 
+
+Donner les prévisions pour $y_t$ (à $10^{-2}$) à horizons $h=1$ et $h=2$ avec un intervalle de prédiction de niveau $95\%$ pour $y_t$
+
+```{r, echo=FALSE}
+forecast(arma22,h=2)
+autoplot(forecast(arma22,h=8))
+```
+
+Calculer la  prévision obtenue pour  $x_{181}$ :
+
+```{r}
+prev<-lm2_csv$coefficients[1]+lm2_csv$coefficients[2]*181+lm2_csv$coefficients[3]*181^2+decompose(ts1)$figure[1]+forecast(arma22,h=1)$mean
+prev
+```
+
+Si on avait voulu utiliser directement SARIMA en filtrant par différentiation
+la tendance et la saisonnalité (d=2 et D=1) ou mieux en demandant à R
+de trouver tout seul le meilleur modèles avec $\texttt{auto.arima()}$ :
+
+```{r}
+#Arima(ts1,order=c(2,2,2),seasonal=c(0,1,0))->sarima
+sarima<-auto.arima(ts1);sarima
+forecast(sarima,h=1)
+autoplot(forecast(sarima,h=8))
+```
+
+```{r}
+HoltWinters(ts1)->ht
+forecast(ht,h=2)
+
+```
+
+```{r}
+knit_exit()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
