@@ -4,10 +4,20 @@ author: "Lancelot Ravier"
 date: "2025-02-17"
 output: html_document
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
-```{r}
+---
+title: "Untitled"
+output:
+  pdf_document: default
+  html_document: default
+date: "2025-02-05"
+editor_options:
+  chunk_output_type: inline
+---
+
+```{r, echo=F}
 library(dplyr)
 library(lubridate)
 library(readr)
@@ -15,98 +25,210 @@ library(hms)
 library(zoo)
 library(forecast)
 library(tseries)
-```
 
-```{r}
 # Importation des données
 
 data <- read.csv("~/github/projet_electricite_temperature/data/powerconsumption.csv", header=T)
-```
 
-
-```{r}
 # Rassemblement des données des 3 centrales en une variable "conso"
 
 data$conso = 
   data$PowerConsumption_Zone1+
   data$PowerConsumption_Zone2+
   data$PowerConsumption_Zone3
-```
 
-```{r}
 # Suppression des variables inutiles
 
 data = data %>%
   select(-PowerConsumption_Zone1, -PowerConsumption_Zone2, -PowerConsumption_Zone3, -Humidity, -WindSpeed, -GeneralDiffuseFlows, -DiffuseFlows)
-```
 
-```{r}
 # Modification du format de date pour faciliter la manipulation
 
 data$Datetime <- as.POSIXct(data$Datetime, format="%m/%d/%Y %H:%M")
-```
 
-#pour janvier
+# Creation d'une df pour l'été
 
-```{r}
-# Creation d'une df pour le mois de Janvier (20 premiers jours)
-# Remplacer le code par window()
-data_janvier <- data %>%
-  filter(month(Datetime) == 1) %>%
+data_ete <- data %>%
+  filter(month(Datetime) == 7 | month(Datetime) == 8) %>%
   filter(minute((Datetime)) == 0) %>%
-  filter(day(Datetime) <= 20)
+  filter(day(Datetime) <= 31)
+```
+
+# TEMPERATURE
+
+holt winters saisonnier
+
+```{r}
+# Creation de la série temporelle pour la température
+
+ts_temp = ts(data_ete$Temperature, frequency = 24, start = c(1,1))
+decompose_temp = decompose(ts_temp)
+plot(decompose_temp)
+```
+```{r}
+ts_temp_deseason = ts_temp - decompose_temp$seasonal
+
+t<-1:1488
+t1<-ts(t,start=c(1,1),freq=24)
+t2<-ts(t^2,start=c(1,1),freq=24)
+lm2 = lm(ts_temp_deseason~t1+t2)
+
+plot(ts_temp_deseason)
+lines(predict(lm2), col = "blue")
 ```
 
 ```{r}
-# Creation de la série temporelle pour la température (toutes les heures, départ 01/01 à 00:00 et fin le 20/01 à 23:00)
+res_ts_temp = ts_temp_deseason - lm2$fitted.values
+par(mfrow=c(1,2))
+acf(res_ts_temp, main="ts_temp - est.trend", lag.max = 192)
+pacf(res_ts_temp)
+```
+```{r}
+adf.test(res_ts_temp)
+kpss.test(res_ts_temp)
+```
+```{r}
+arima_model_res = arima(res_ts_temp, order = c(1, 0, 2), seasonal = list(order = c(1, 1, 1), period = 24)) # = auto.arima()
 
-ts_janvier = ts(data_janvier$Temperature, frequency = 24, start = c(1,1))
+par(mfrow=c(1,2))
+acf(arima_model_res$residuals, main="serie1 csv - est. tend.", ylim = c(-1, 1))
+pacf(arima_model_res$residuals, ylim = c(-1, 1))
+```
+```{r}
+library("car")
 
-plot.ts(ts_janvier,
-        main="température en janvier",
-        xlab= "jour",
-        ylab="Température",
-        col="red",)
-for (i in 1:21) {
-  abline(v=i)
-}
+arima_model_2 = arima(ts_temp, order = c(1, 0, 2), seasonal = list(order = c(1, 1, 1), period = 24)) # = auto.arima()
+arima_model_2_log = arima(log(ts_temp), order = c(1, 0, 2), seasonal = list(order = c(1, 1, 1), period = 24)) # = auto.arima()
+arima_model_2_sqrt = arima(BoxCox(ts_temp, lambda = "auto"), order = c(1, 0, 2), seasonal = list(order = c(1, 1, 1), period = 24)) # = auto.arima()
+
+par(mfrow = c(1, 3))
+qqPlot(arima_model_2$residuals)
+qqPlot(arima_model_2_log$residuals)
+qqPlot(arima_model_2_sqrt$residuals)
+
 ```
 
 ```{r}
-par(mfrow = c(2,1))
-acf(ts_janvier, lag.max = 96)
-pacf(ts_janvier, lag.max = 24)
+par(mfrow = c(1,2))
+fitted_values_2 <- fitted(arima_model_2)
+plot(fitted_values_2, arima_model_2$residuals, main="Résidus vs Valeurs Ajustées", 
+     xlab="Valeurs Ajustées", ylab="Résidus")
+abline(h=0, col="red")
+
+fitted_values <- fitted(arima_model_2_sqrt)
+plot(fitted_values, arima_model_2_sqrt$residuals, main="Résidus vs Valeurs Ajustées", 
+     xlab="Valeurs Ajustées", ylab="Résidus")
+abline(h=0, col="red")
+```
+decompose + predict + residus
+```{r}
+Box.test(arima_model_res$residuals, type="Ljung")
 ```
 
 ```{r}
-par(mfrow = c(2,1))
-acf(diff(ts_janvier, difference = 1), lag.max = 300)
-pacf(diff(ts_janvier, difference = 1), lag.max = 96)
+auto_arima_temp <- auto.arima(ts_temp, ic = "bic")
 ```
-
-On choisit difference = 3 donc ARIMA(p,3,q) car d = 3 permet de rendre la série stationnaire.
-
-(il faut modéliser la trend avec deecompose et montrer que le degre 3 la modelise le mieux)
 
 ```{r}
-par(mfrow = c(2,1))
-model = arima(ts_janvier, seasonal = list(order = c(1, 0, 0), period = 24), method='ML', include.drift = T)
+arima_model_1 = arima(ts_temp, order = c(1, 0, 2), seasonal = list(order = c(0, 0, 2), period = 24)) # = auto.arima()
 ```
 
-Pour l'ACF, on voit que les significativités deviennent nulles au lag q = 1 donc ACF(1, 3, p)
 
 ```{r}
-acf(model$residuals, lag.max = 96)
-pacf(model$residuals, lag.max = 96)
-```
+predict_temp <- forecast(arima_model_1, h = 192)
+test_predict_temp <- forecast(auto_arima_temp, h = 192)
+predict_temp_season <- forecast(arima_model_2, h = 192)
 
-On va essayer de recuperer le coefficient d'auto-regression en faisant la regression linéaire suivante : lm(ln(\rho(h)) ~ln(h))
+par(mfrow = c(1, 3))
+xlim_start <- as.POSIXct("2017-09-01 00:00:00")
+xlim_end <- as.POSIXct("2017-09-03 23:00:00")
+
+plot(test_predict_temp, xlim = c(63, 66), ylim = c(10, 40), main = "SARIMA(2,0,0)(2,1,0)[24]")
+
+plot(data$Datetime, data$Temperature, col = "red", type = "l", 
+     xlim = c(xlim_start, xlim_end),
+     xlab = "Temps", ylab = "Consommation électrique", 
+     main = "Temperature", ylim = c(10, 40))
+
+plot(predict_temp_season, xlim = c(63, 66), ylim = c(10, 40), main = "ARIMA(1,0,2)(0,0,2)[24]")
+```
+Erreur de prevision entre les deux
+# CONSOMMATION
 
 ```{r}
-acf_values <- acf(model$residuals, lag.max = 96, plot = FALSE)$acf
-ln_rho <- log(acf_values)
-ln_h <- log(1:length(acf_values))
-model_rho <- lm(ln_rho ~ ln_h)
-summary(model_rho)
+# Creation de la série temporelle pour la température
+
+ts_watt = ts(data_ete$conso, frequency = 24, start = c(1,1))
+decompose_watt = decompose(ts_watt)
+plot(decompose_watt)
+```
+```{r}
+ts_watt_trend = decompose_watt$trend
+
+t<-1:1488
+t1<-ts(t,start=c(1,1),freq=24)
+t2<-ts(t^2,start=c(1,1),freq=24)
+t3<-ts(t^3,start=c(1,1),freq=24)
+t4<-ts(t^4,start=c(1,1),freq=24)
+t5<-ts(t^5,start=c(1,1),freq=24)
+lm2 = lm(ts_watt_trend~t1+t2)
+
+plot(ts_watt_trend, ylim = c(0, 500000))
+lines(predict(lm2), col = "blue")
 ```
 
+```{r}
+par(mfrow=c(1,2))
+acf(ts_watt, main="ts_watt - est.trend", lag.max = 192)
+pacf(ts_watt)
+adf.test(ts_watt)
+```
+
+```{r}
+arima_watt_res_1 = arima(ts_watt, order = c(2, 0, 0), seasonal = list(order = c(1, 1, 1), period = 24)) # = auto.arima()
+
+par(mfrow=c(1,2))
+acf(arima_watt_res_1$residuals, main="serie1 csv - est. tend.", ylim = c(-1, 1), lag.max = 192)
+pacf(arima_watt_res_1$residuals, ylim = c(-1, 1), lag.max = 192)
+```
+
+```{r}
+Box.test(arima_watt_res_1$residuals, type="Ljung")
+```
+
+```{r}
+par(mfrow = c(1,3))
+fitted_values <- fitted(arima_watt_res_1)
+plot(fitted_values, arima_watt_res_1$residuals, main="Résidus vs Valeurs Ajustées", 
+     xlab="Valeurs Ajustées", ylab="Résidus")
+abline(h=0, col="red")
+
+hist(arima_watt_res_1$residuals, main = "Histogramme des résidus", probability = TRUE)
+lines(density(arima_watt_res_1$residuals), col = "blue")
+lines(density(rnorm(1000000)), col = "red")
+
+qqPlot(arima_watt_res_1$residuals)
+```
+```{r}
+auto_arima_watt <- auto.arima(ts_watt, ic = "bic", seasonal = T)
+arima_watt_res_2 = arima(ts_watt, order = c(0, 0, 1), seasonal = list(order = c(0, 0, 2), period = 24)) # = auto.arima()
+```
+
+```{r}
+
+predict_watt <- forecast(arima_watt_res_1, h = 24)
+test_predict_watt <- forecast(auto_arima_watt, h = 24)
+
+par(mfrow = c(1, 3))
+xlim_start <- as.POSIXct("2017-09-01 00:00:00")
+xlim_end <- as.POSIXct("2017-09-01 23:00:00")
+
+plot(test_predict_watt, xlim = c(63, 64), ylim = c(40000, 120000))
+
+plot(data$Datetime, data$conso, col = "red", type = "l", 
+     xlim = c(xlim_start, xlim_end),
+     xlab = "Temps", ylab = "Consommation électrique", 
+     main = "Temperature", ylim = c(40000, 120000) )
+
+plot(predict_watt, xlim = c(63, 64), ylim = c(40000, 120000))
+```
