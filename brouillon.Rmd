@@ -7,16 +7,6 @@ editor_options:
   chunk_output_type: inline
 ---
 
----
-title: "Untitled"
-output:
-  pdf_document: default
-  html_document: default
-date: "2025-02-05"
-editor_options:
-  chunk_output_type: inline
----
-
 ```{r, echo=F}
 library(dplyr)
 library(lubridate)
@@ -59,8 +49,6 @@ data_ete <- data %>%
 holt winters saisonnier
 
 ```{r}
-# Creation de la série temporelle pour la température
-
 ts_temp = ts(data_ete$Temperature, frequency = 24, start = c(1,1))
 decompose_temp = decompose(ts_temp)
 plot(decompose_temp)
@@ -133,13 +121,22 @@ auto_arima_temp <- auto.arima(ts_temp, ic = "bic")
 arima_model_1 = arima(ts_temp, order = c(1, 0, 2), seasonal = list(order = c(0, 0, 2), period = 24)) # = auto.arima()
 ```
 
+```{r}
+hw_temp <- HoltWinters(ts_temp, alpha = T, gamma = T)
+ets_temp <- ets(ts_temp)
+```
 
 ```{r}
-predict_temp <- forecast(arima_model_1, h = 192)
+auto_arima_temp <- auto.arima(ts_temp, ic = "bic")
+ets_temp <- ets(ts_temp)
+
+predict_temp <- forecast(arima_model, h = 192)
 test_predict_temp <- forecast(auto_arima_temp, h = 192)
 predict_temp_season <- forecast(arima_model_2, h = 192)
+predict_hw_temp <- forecast(hw_temp, h = 192)
+predict_ets_temp <- forecast(ets_temp, h = 192)
 
-par(mfrow = c(1, 3))
+par(mfrow = c(1, 5))
 xlim_start <- as.POSIXct("2017-09-01 00:00:00")
 xlim_end <- as.POSIXct("2017-09-03 23:00:00")
 
@@ -151,6 +148,9 @@ plot(data$Datetime, data$Temperature, col = "red", type = "l",
      main = "Temperature", ylim = c(10, 40))
 
 plot(predict_temp_season, xlim = c(63, 66), ylim = c(10, 40), main = "ARIMA(1,0,2)(0,0,2)[24]")
+plot(predict_ets_temp, xlim = c(63, 66), ylim = c(10, 40), main = "ets")
+plot(predict_hw_temp, xlim = c(63, 66), ylim = c(10, 40), main = "Holt Winters")
+
 ```
 Erreur de prevision entre les deux
 # CONSOMMATION
