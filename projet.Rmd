@@ -357,16 +357,16 @@ plot(pred_ets_temp, main = "ets\n(M,Ad,A)",
 
 ```{r}
 # Calculer les métriques pour chaque modèle
-accuracy_manual_arima <- round(accuracy(manual_arima_temp), 3)
-accuracy_auto_arima <- round(accuracy(auto_arima_temp), 3)
-accuracy_ets <- round(accuracy(ets_temp), 3)
+accuracy_manual_arima <- round(accuracy(mod_conso_sarima), 3)
+accuracy_auto_arima <- round(accuracy(auto_arima_conso), 3)
+accuracy_ets <- round(accuracy(ets_conso), 3)
 
 # Extraire les AIC et BIC de chaque modèle
-aic_manual_arima <- round(manual_arima_temp$aic, 3)
+aic_manual_arima <- round(mod_conso_sarima$aic, 3)
 
-aic_auto_arima <- round(auto_arima_temp$aic, 3)
+aic_auto_arima <- round(auto_arima_conso$aic, 3)
 
-aic_ets <- round(ets_temp$aic, 3)
+aic_ets <- round(ets_conso$aic, 3)
 
 # Créer un tableau de comparaison avec AIC et BIC
 comparison_table <- rbind(
