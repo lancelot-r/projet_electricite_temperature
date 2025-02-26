@@ -6,11 +6,12 @@ output:
   html_document: default
 date: "2025-02-05"
 editor_options:
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = F)
+library(car)
+knitr::opts_chunk$set(echo = F, warning=FALSE)
 ```
 
 # Introduction
@@ -52,6 +53,11 @@ data_ete <- data %>%
   filter(month(Datetime) == 7 | month(Datetime) == 8) %>%
   filter(minute((Datetime)) == 0) %>%
   filter(day(Datetime) <= 31)
+
+data_test <- data %>%
+  filter((month(Datetime) == 7 | month(Datetime) == 8) |
+         (month(Datetime) == 9 & day(Datetime) <= 3)) %>%
+  filter(minute(Datetime) == 0)
 ```
 
 ```{r, echo = F}
@@ -86,118 +92,52 @@ plot(decompose_temp)
 
 A partir de la décomposition de la série temporelle *st_temperature* :
 
-1) La tendance semble linéaire : malgré les fluctuations visibles, la période estivale analysée donne l'intuition de températures relativement constantes dans les deux mois selectionnés
+1) La tendance semble linéaire : malgré les fluctuations visibles, la période estivale analysée donne l'intuition de températures relativement constantes dans les deux mois selectionnés **CALCULER LES MOYENNES*
 2) Une saisonalité journalière semble se dessiner : l'intuition derrière cette analyse est que malgré une tendance constante, les températures baissent la nuit avant de remonter en journée (pic haut à 14, pic bas à 6h **A VERIFIER**)
-3) La partie résiduelle **A COMPLETER**
 
-Comme la trend a une amplitude de moins de 10°C sur une période de plus de 60 jours, il ne semble pas nécessaire de modéliser la tendance autrement que par la température moyenne de cette dernière sous peine de complexifier le modèle. Néanmoins, on peut essayer d'ajuster un modèle linéaire. Sans grande surprise, le coefficient directeur de la droite de regression est de l'ordre de $-10^{-3}$. Toutefois, ce choix va influencer le **test kpss de non-stationnarité** car ce dernier, à la différence du **test de racine unitaire augmenté de Dickey-Fuller**, va détecter la trend non modélisée avec comme conséquence une non-stationnarité de la série. **ATTENTION ON DOIT CHOISIR SI OUI OU NON ON MODELISE LA TREND ET EXPLIQUER EXPLICITEMENT LE CHOIX**
-
-```{r, include=F}
-par(mfrow=c(1,2))
-plot(decompose(diff(ts_temp))$trend)
-plot(decompose_temp$trend)
-```
-
-```{r, include = F}
-t<-1:length(ts_temp)
-t1<-ts(t,start=c(1,0),freq=24)
-mod_trend_lin=lm(decompose_temp$trend~t1)
-summary(mod_trend_lin)
-```
-
-```{r, include = F}
-plot.ts(decompose_temp$trend, ylim=c(23,33))
-abline(mod_trend_lin$coefficients)
-#abline(h=mean(decompose_temp$trend, na.rm = T), col='red')
-```
-
-```{r, include=F}
-par(mfrow=c(3,1))
-plot(decompose(diff(ts_temp))$trend)
-plot(decompose_temp$trend)
-plot(decompose_temp$trend-mod_trend_lin$fitted.values, na.rm=T)
-```
-
-```{r}
-kpss.test(ts_temp-mod_trend_lin$fitted.values)
-```
+Comme la trend a une amplitude de moins de 10°C sur une période de plus de 60 jours, il ne semble pas nécessaire de modéliser la tendance autrement que par la température moyenne de cette dernière sous peine de complexifier le modèle. Néanmoins, on peut essayer d'ajuster un modèle linéaire. Sans grande surprise, le coefficient directeur de la droite de regression est de l'ordre de $-10^{-3}$. Nous ferons le choix de ne pas modéliser la trend pour le moment : lorsque nous effectuerons le test de kpss de stationnarité, celui-ci montrera s'il reste une part de tendance dans notre partie résiduelle.
 
 Maintenant, analysons l'ACF et le Partial ACF de la série temporelle afin de pouvoir selectionner et paramétrer au mieux le modèle final :
 
 ```{r}
-par(mfrow=c(1,2))
-acf(ts_temp, main="ts_temp - est.trend", lag.max = 192)
-pacf(ts_temp)
+acf(ts_temp, main="ts_temp", lag.max = 192, ylim = c(-1, 1))
 ```
 
-
-- Pour l'ACF, la forme de sinusoïde montre une saisonalité claire, toutes les 24h (ce qui vient confirmer l'intuition de départ). Les "pics" aux lags 2 à 8 suggère une part de type moyenne-mobile dans le modèle.
-- Par ailleurs, pour le partial ACF, les "pics" aux lags 1 et 2 suggère une part de type auto-regressive de paramètre 2.
-
-On part donc sur un modèle ARIMA de paramètre (p=2,i=0,q).
-Pour choisir le paramètre q, on choisit le modèle minimisant l'AIC (ce choix sera justifié plus tard)
+- La forme de sinusoïde de l'ACF montre une saisonalité claire à chaque lag (toutes les 24h) (ce qui vient confirmer l'intuition de départ). Ainsi, nous allons commencer par modéliser notre série avec un modèle SARIMA en ajoutant une différenciation saissonière (D=1). Le test kpss donnera ensuite une indication sur la stationnarité ou non des résidus de notre modèle **ATTENTION A LA FORMULATION**.
 
 ```{r}
-par(mfrow=c(1,1))
-ARIMA_AIC_list=c()
-for (q in 0:5) {
-  mod=arima(ts_temp, order = c(2, 0, q))
-  ARIMA_AIC_list=c(ARIMA_AIC_list, mod$aic)
-}
-plot(0:5,ARIMA_AIC_list, type='b')
+par(mfrow=c(1,3))
+manual_arima_temp=arima(ts_temp, order = c(0, 0, 0), seasonal = list(order = c(0, 1, 0), period = 24))
+kpss.pval = kpss.test(manual_arima_temp$residuals)$p.value
+acf(manual_arima_temp$residuals, lag.max = 96, ylim = c(-1, 1))
+pacf(manual_arima_temp$residuals, lag.max = 96, ylim = c(-1, 1))
+text(1.2,0.7,paste("pval kpss=",round(kpss.pval,3)))
+
+qqPlot(manual_arima_temp$residuals)
 ```
+- l'ACF nous montre que la différenciation saissonière appliquée a bien permis de supprimer la saissonalité (le pattern sinusoidal a disparu).
+- Le test kpss (non-signiifcatif) indique que les résidus de notre modèle sont stationnaires : en plus de la suppression effective de la saissonalité par différenciation, le test nous montre aussi qu'il n'est pas nécessaire de modéliser la trend par différenciation car celle-ci n'est pas présente dans nos résidus (elle n'influence pas la stationnarité dans notre cas).
+- Le fait que l'ACF et le PACF sont significatifs à chaque lag nous pousse a appliquer un terme auto-régressif (PACF) et de moyenne mobile (ACF) tout deux saisonniers (P = 1, Q = 1).
+- Sur le PACF, deux pics sont significatifs poue chaque période, ce qui nous pousse a prendre un terme auto-regressif d'ordre 2 (p = 2).
 
-On voit que pour q=2, l'AIC est de 3544 alors qu'il est de 3541 pour q=3. Nous avons fait le choix de ne pas trop complexifier le modèle quitte à perdre en précisions : ainsi, nous choisissons q=2.
 
-```{r}
-par(mfrow=c(2,1))
-mod1=arima(ts_temp, order = c(2, 0, 2))
-acf(mod1$residuals, lag.max = 96)
-pacf(mod1$residuals, lag.max = 96)
-```
-```{r}
-Box.test(mod1$residuals,type="Ljung")$p.value
-```
-
-Bien que le test de Box-Ljung admet une p-valeur de 0.82, l'acf et le pacf montre des "pics" à chaque période. Ceci est un symptome de saisonnalité ; le modèle permettant de mieux modéliser la partie résiduelle est donc un modèle SARIMA. 
-Les pics aux lags 24 sur l'acf et le pacf suggère un modèle SARIMA(p=2,i=0,q=2)(P=1,D=1,Q=1)[24]
+Analysons maintenant les résidus de notre modèle final SARIMA(2,0,0)(1,1,1)[24]
 
 ```{r}
-par(mfrow=c(1,2))
-manual_arima_temp=arima(ts_temp, order = c(1, 0, 2), seasonal = list(order = c(1, 1, 1), period = 24))
-acf(manual_arima_temp$residuals, lag.max = 96)
-pacf(manual_arima_temp$residuals, lag.max = 96)
-```
-
-Il nous resterait à comparer les aic de tous les modèles SARIMA tels que $P+D+Q=3$ mais on trouverait que le modèle précédent a l'aic le plus bas. 
-```{r}
-Box.test(manual_arima_temp$residuals,type="Ljung")$p.value
-```
-
-On constate que le test de Box-Ljung admet une p-valeur encore plus proche de 1 et que les pics symptomatiques du modèle ARIMA sont moins prononcés et plus rares. De plus, l'AIC affiché est meilleur : 3161 pour le modèle SARIMA contre 3544 pour le modèle ARIMA. On retiendra donc le nouveau modèle.
-
-Le **test de racine unitaire augmenté de Dickey Fuller** sur la partie résiduelle de nos données étant **significative**, nous avons fait le choix de constituer **ATTENTION ON IGNORE LA TREND OU NON ?*
-
-Nous avons donc fait le choix de constituer un modèle $\text{ARIMA(p = 1, d = 0, q = 2)(P = 1, D = 1, Q = 1)[24]}$ : ce modèle contient un terme auto-régressif d'ordre $p = 1$, aucun terme de différenciation car la série est supposée stationnaire **ATTENTION MODELISATION OU NON TREND**, un terme de moyenne mobile d'ordre $q = 1$. Pour la partie saisonnière, celle-ci a été modélisée 
-
-```{r}
-par(mfrow=c(2,1))
-manual_arima_temp = arima(ts_temp, order = c(2, 0, 2), seasonal = list(order = c(1, 1, 1), period = 24)) # = auto.arima()
-```
-
-```{r}
-pB <- Box.test(manual_arima_temp$residuals,type="Ljung")$p.value
-par(mfrow=c(1,2))
+manual_arima_temp=arima(ts_temp, order = c(2, 0, 0), seasonal = list(order = c(1, 1, 1), period = 24))
+pB = Box.test(manual_arima_temp$residuals,type="Ljung")$p.value
+par(mfrow=c(1,3))
 acf(manual_arima_temp$residuals, main="arima manuel - ACF", ylim = c(-1, 1));pacf(manual_arima_temp$residuals, ylim = c(-1, 1), main = "arima manuel - PACF")
 text(0.7,0.7,paste("pval BL=",round(pB,3)))
+qqPlot(manual_arima_temp$residuals)
 ```
 
-**PEUT ETRE RAJOUER DES COMPARAISONS AVEC D'AUTRES MODELES ?? AIC ??**
+Selon les deux graphiques, la quasi-totalité des variation sisgnificatives ont été captées par notre modèle. Le test de Box vient confirmer cette intuition en montrant que les résidus de notre modèle sont bien un bruit blanc (test non significatif).
 
-Le test de **Ljung-Box** indique que les résidus de notre modèle ARIMA est un bruit blanc (au seuil $\alpha = 99\%$). De plus; l'interprétation graphique de l'ACF et du PACF nous indique que notre modèle capture la quasi-totalité des variations non-aléatoires de notre série temporelle. 
+**PARLER EN TERME D'AIC**
 
-Après analyse, les perturbations du modèle semblent homoscédastiques : l'intuition sur la non-variabilité des température moyennes durant ces deux mois viennent confirmer l'analyse, même si les résidus ne sont pas parfaitement heteroscédastiques (**test de Breuch-Pagan d'heteroscédasticité significatif**) **EXPLIQUER L'INTUITION AVEC LA TEMPERATURE**
-Les résidus du modèle ne suivent pas une loi normale : malgré **l'absence de skew (distribution centrée)**, la distribution de nos rédidus reste **fortement leptokurtique**. 
+Après analyse, les perturbations du modèle semblent homoscédastiques : l'intuition sur la non-variabilité des température moyennes durant ces deux mois viennent confirmer l'analyse, même si les résidus ne sont pas parfaitement homoscédastiques (**test de Breuch-Pagan d'heteroscédasticité significatif**) **EXPLIQUER L'INTUITION AVEC LA TEMPERATURE**
+Les résidus du modèle ne suivent pas une loi normale : la distribution de nos rédidus reste **fortement leptokurtique** et **asymétrique à droite**. 
 
 En réalité, nous n'effectuons pas de test paramétriques sur nos modèles. De plus, l'objectif principal étant la modélisation à très court-terme, nous vons choisi de négliger les hypothèses d'homoscédasticité (parfaite) et de normalité des résidus. Il ne faudra donc pas tenir compte des intervalles de confiance dont le calcul sur R n'est valable que pour des résidus suivant une loi normale. 
 
@@ -208,26 +148,21 @@ auto_arima_temp <- auto.arima(ts_temp, ic = "bic")
 ets_temp <- ets(ts_temp)
 ```
 
+
 ```{r}
 pred_arima <- forecast(manual_arima_temp, h = 192)
 pred_auto_arima <- forecast(auto_arima_temp, h = 192)
 pred_ets_temp <- forecast(ets_temp, h = 192)
 
-par(mfrow = c(1, 4))
-xlim_start <- as.POSIXct("2017-09-01 00:00:00")
-xlim_end <- as.POSIXct("2017-09-03 23:00:00")
+ts_test_temp = ts(data_test$Temperature, start = c(1,1), frequency = 24)
 
-plot(data$Datetime, data$Temperature, col = "red", type = "l", 
-     xlim = c(xlim_start, xlim_end),
-     xlab = "Date", ylab = "Temperature (°c)", 
-     main = "Données réeles", ylim = c(10, 40))
+plot(ts_test_temp, xlim = c(63,66), ylim = c(10, 40),
+     xlab = "Date", ylab = "Consommation électrique (kWh)",
+     main = "Comparaison des modèles de prévision", col = "black", lwd = 3)
 
-plot(pred_arima, xlim = c(63, 66), ylim = c(10, 40), main = "manual-ARIMA\n(1,0,2)(1,1,1)[24]",
-     xlab = "Date", ylab = "Temperature (°c)",)
-plot(pred_auto_arima, xlim = c(63, 66), ylim = c(10, 40), main = "auto-ARIMA\n(2,0,0)(2,1,0)[24]",
-     xlab = "Date", ylab = "Temperature (°c)",)
-plot(pred_ets_temp, xlim = c(63, 66), ylim = c(10, 40), main = "ets\n(M,Ad,A)",
-     xlab = "Date", ylab = "Temperature (°c)")
+lines(pred_arima$mean, col = "green")
+lines(pred_auto_arima$mean, col = "blue")
+lines(pred_ets_temp$mean, col = "orange")
 ```
 
 ```{r}
@@ -267,102 +202,71 @@ decompose_conso = decompose(ts_conso)
 plot(decompose_conso)
 ```
 
-```{r}
-par(mfrow=c(1,1))
-plot(decompose_conso$random)
-```
-
+A partir de la décomposition de la  séri temporelle *ts_consommation* :
 La trend est comprise entre environ 70000 et 100000 kWh (amplitude de 30000 kWh). Cette dernière est globalement croissante sur le mois de juillet puis décroissante sur le mois d'août. 
 On constate une saisonalité journalière avec une amplitude de 60000 kWh (consommation minimale à 6h et maximale à 20h)
-Enfin, la partie résiduelle **A COMPLETER**
 
+- La tendance est ici non négligeable, comprise entre 70000 et 100000 kWh (amplitude de 30000 kWh). Il sera donc important d'appliquer une différenciation dans notre modèe afin de capter cette tendance.
+- Il y'a une forte saissonalité journalière ici aussi,avec une amplitude de 60000 kWh (consommation minimale à 6h et maximale à 20h) : en effet, en partant des analyses de température, celles-ci chutent la nuit à une température acceptable sans chauffage (20°c) et remontent en journée vers des températures très hautes (entre 30 et 40 degrés) nécéssitant, si disponible, l'utilisation de climatisation **PARLER AUSSI DE LA PRESENCE A LA MAISON ET DU FAIT QUE C'EST LA CONSO TOTALE ET NON PAS DES MENAGES**, qui est source de consommation energétique. Ainsi, selon cette intuition, cette saissonalité serait présente à chaque temp (toutes les 24h). Il sera aussi important d'appliquer une différenciation saisonnière afin de capter la saissonalité de nos données.
 
-```{r, include = F}
-t<-1:length(ts_conso)
-t1<-ts(t,start=c(1,0),freq=24)
-mod_conso_lin=lm(decompose_conso$trend~t1)
-summary(mod_conso_lin)
-```
+Afin de confirmer nos intuitions, regardons l'ACF de la série temporelle :
 
-```{r, include = F}
-plot.ts(decompose_conso$trend)
-abline(mod_conso_lin$coefficients)
-#abline(h=mean(decompose_temp$trend, na.rm = T), col='red')
+```{r}
+acf(ts_conso, main="ts_conso", lag.max = 192, ylim = c(-1, 1))
 ```
 
 ```{r}
-plot(decompose(diff(ts_conso)))
+manual_arima_conso = arima(ts_conso, order = c(0, 1, 0), seasonal = list(order = c(0, 1, 0), period = 24))
+kpss.pval = kpss.test(manual_arima_temp$residuals)$p.value
+pB <- Box.test(manual_arima_conso$residuals,type="Ljung")$p.value
+par(mfrow=c(1,3))
+acf(manual_arima_conso$residuals, main="arima manuel - ACF", ylim = c(-1, 1));pacf(manual_arima_conso$residuals, ylim = c(-1, 1), main = "arima manuel - PACF")
+text(0.6,0.7,paste("pval kpss=",round(kpss.pval,3)))
+text(0.6,0.5,paste("pval Box=",round(pB,3)))
+qqPlot(manual_arima_conso$residuals)
 ```
-
+- L'ACF et le PACF montrent des pics significatifs à chaque période (tout les 24 pics) montrant ainsi une saissonalité dans les deux graphs **A REFORMULER**. Afin de corriger cela, nous applliquerons un paramètre auto-régressif et de moyenne mobile saissonier d'ordre 1 ($P = 1, Q = 1$).
+- On voit le premier pic du PACF significatif. Ainsi, nous allons appliquer un terme auto-régressif d'ordre $p = 1$.
 
 ```{r}
-par(mfrow=c(1,2))
-acf(diff(ts_conso), lag.max = 96)
-pacf(diff(ts_conso), lag.max = 96)
-
+manual_arima_conso = arima(ts_conso, order = c(1, 1, 0), seasonal = list(order = c(1, 1, 1), period = 24))
+pB <- Box.test(manual_arima_conso$residuals,type="Ljung")$p.value
+par(mfrow=c(1,3))
+acf(manual_arima_conso$residuals, main="arima manuel - ACF", ylim = c(-1, 1));pacf(manual_arima_conso$residuals, ylim = c(-1, 1), main = "arima manuel - PACF")
+text(0.7,0.7,paste("pval BL=",round(pB,3)))
+qqPlot(manual_arima_conso$residuals)
 ```
-
-L'acf et le pacf montre une saisonalité claire. 
-Essayons d'abord de modéliser la consommation à l'aide d'un modèle ARIMA : si ce dernier ne s'avère pas assez précis, nous nous orienterons vers un modèle SARIMA. 
-L'acf et le pacf suggère d'abord un modèle ARIMA(1,1,2)
-
-```{r}
-mod_conso_arima=arima(ts_conso, order = c(1, 1, 2), seasonal = list(order = c(0, 0, 0), period = 24))
-par(mfrow=c(1,2))
-acf(mod_conso_arima$residuals, lag.max = 96)
-pacf(mod_conso_arima$residuals, lag.max = 96)
-```
-
-On constate mieux l'aspect saisonnier de la série temporelle. Les pics sur l'acf et le pacf suggère alors un modèle SARIMA(1,1,2)(1,1,1)[24].
-
-```{r}
-mod_conso_sarima=arima(ts_conso, order = c(1, 1, 2), seasonal = list(order = c(1, 2, 2), period = 24))
-par(mfrow=c(1,2))
-acf(mod_conso_sarima$residuals, lag.max = 96)
-pacf(mod_conso_sarima$residuals, lag.max = 96)
-```
+Selon les deux graphiques, la quasi-totalité des variation sisgnificatives ont été captées par notre modèle. Le test de Box vient confirmer cette intuition en montrant que les résidus de notre modèle sont bien un bruit blanc (test non significatif).
 
 ```{r}
 auto_arima_conso <- auto.arima(ts_conso, ic = "bic")
 ets_conso <- ets(ts_conso)
 ```
 
-
 ```{r}
-acf(auto_arima_conso$residuals, lag.max = 96)
-pacf(auto_arima_conso$residuals, lag.max = 96)
-```
-
-```{r}
-pred_arima <- forecast(mod_conso_sarima, h = 192)
+pred_arima <- forecast(manual_arima_conso, h = 192)
 pred_auto_arima <- forecast(auto_arima_conso, h = 192)
 pred_ets_temp <- forecast(ets_conso, h = 192)
 
-par(mfrow = c(1, 4))
-xlim_start <- as.POSIXct("2017-09-01 00:00:00")
-xlim_end <- as.POSIXct("2017-09-03 23:00:00")
+ts_test_conso = ts(data_test$conso, start = c(1,1), frequency = 24)
 
-plot(data$Datetime, data$conso, col = "red", type = "l", 
-     xlim = c(xlim_start, xlim_end),
-     xlab = "Date", ylab = "Consommation électrique (kWh)", 
-     main = "Données réeles", ylim=c(40000,120000))
+plot(ts_test_conso, xlim = c(63,66), ylim = c(40000, 120000),
+     xlab = "Date", ylab = "Consommation électrique (kWh)",
+     main = "Comparaison des modèles de prévision", col = "black", lwd = 3)
 
-plot(pred_arima, main = "manual-ARIMA\n(1,1,2)(1,2,2)[24]",
-     xlab = "Date", ylab = "Consommation électrique (kWh)", xlim = c(63, 66), ylim = c(40000,120000))
-plot(pred_auto_arima, main = "auto-ARIMA\n(0,1,1)(0,1,1)[24]",
-     xlab = "Date", ylab = " (°c)",xlim = c(63, 66), ylim = c(40000,120000))
-plot(pred_ets_temp, main = "ets\n(M,Ad,A)",
-     xlab = "Date", ylab = "consommation électrique (kWh)", xlim = c(63, 66), ylim = c(40000,120000))
+lines(pred_arima$mean, col = "green")
+lines(pred_auto_arima$mean, col = "blue")
+lines(pred_ets_temp$mean, col = "orange")
 ```
 
 ```{r}
 # Calculer les métriques pour chaque modèle
-accuracy_manual_arima <- round(accuracy(mod_conso_sarima), 3)
+accuracy_manual_arima <- round(accuracy(manual_arima_conso), 3)
 accuracy_auto_arima <- round(accuracy(auto_arima_conso), 3)
 accuracy_ets <- round(accuracy(ets_conso), 3)
 
 # Extraire les AIC et BIC de chaque modèle
-aic_manual_arima <- round(mod_conso_sarima$aic, 3)
+aic_manual_arima <- round(manual_arima_conso$aic, 3)
 
 aic_auto_arima <- round(auto_arima_conso$aic, 3)
 
