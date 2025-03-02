@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.12.20)  2 MAR 2025 01:19
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.12.20)  2 MAR 2025 10:32
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**"/Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/main.tex"
-(/Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/main.tex
+**/Users/admin/github/projet_electricite_temperature/fichier_tex/main.tex
+(/Users/admin/github/projet_electricite_temperature/fichier_tex/main.tex
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
 (/usr/local/texlive/2024/texmf-dist/tex/latex/base/article.cls
@@ -874,7 +874,7 @@ Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 File: l3backend-pdftex.def 2024-02-20 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count342
 \l__pdf_internal_box=\box128
-) (/Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/main.aux
+) (./main.aux
 
 LaTeX Warning: Label `fig:enter-label' multiply defined.
 
@@ -1021,256 +1021,257 @@ Package pdftex.def Info: fig1.png  used on input line 110.
 (pdftex.def)             Requested size: 443.57848pt x 59.03952pt.
 [1
 
-{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc} </Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig1.png>]
+{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc} <./fig1.png>]
 <fig2.png, id=19, 697.60625pt x 369.38pt>
 File: fig2.png Graphic file (type png)
 <use fig2.png>
 Package pdftex.def Info: fig2.png  used on input line 127.
 (pdftex.def)             Requested size: 210.69908pt x 111.56447pt.
 
-Underfull \hbox (badness 4543) in paragraph at lines 134--135
+Underfull \hbox (badness 4543) in paragraph at lines 133--134
 []\OT1/cmr/m/n/10 La ten-dance sem-ble lin^^Seaire : malgr^^Se
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 135--136
+Underfull \hbox (badness 10000) in paragraph at lines 134--135
 []\OT1/cmr/m/n/10 Une saison-nalit^^Se jour-nali^^Rere sem-ble se
  []
 
 
-Underfull \hbox (badness 2512) in paragraph at lines 135--136
+Underfull \hbox (badness 2512) in paragraph at lines 134--135
 \OT1/cmr/m/n/10 est que malgr^^Se une ten-dance con-stante,
  []
 
 <fig3.png, id=20, 257.16075pt x 115.632pt>
 File: fig3.png Graphic file (type png)
 <use fig3.png>
-Package pdftex.def Info: fig3.png  used on input line 144.
+Package pdftex.def Info: fig3.png  used on input line 143.
 (pdftex.def)             Requested size: 210.69908pt x 94.74121pt.
 
-Underfull \hbox (badness 1735) in paragraph at lines 149--150
+Underfull \hbox (badness 1735) in paragraph at lines 148--149
 []\OT1/cmr/m/n/10 La forme de si-nuso^^?^^Pde de l'ACF mon-tre une
  []
 
 
-Underfull \hbox (badness 1466) in paragraph at lines 149--150
+Underfull \hbox (badness 1466) in paragraph at lines 148--149
 \OT1/cmr/m/n/10 (ce qui vient con-firmer l'intuition de d^^Separt).
  []
 
 
-Overfull \hbox (17.2222pt too wide) in paragraph at lines 125--154
+Overfull \hbox (17.2222pt too wide) in paragraph at lines 125--153
 []$[]$ $[]$ 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 125--154
+Underfull \hbox (badness 10000) in paragraph at lines 125--153
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 125--154
+Underfull \hbox (badness 10000) in paragraph at lines 125--153
 
  []
 
 
-Overfull \hbox (2.2222pt too wide) in paragraph at lines 125--154
+Overfull \hbox (2.2222pt too wide) in paragraph at lines 125--153
 []$ $[]$ 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 125--154
+Underfull \hbox (badness 10000) in paragraph at lines 125--153
 
  []
 
 <fig4.png, id=21, 678.535pt x 410.53375pt>
 File: fig4.png Graphic file (type png)
 <use fig4.png>
-Package pdftex.def Info: fig4.png  used on input line 157.
+Package pdftex.def Info: fig4.png  used on input line 156.
 (pdftex.def)             Requested size: 210.69908pt x 127.47713pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 163--164
+Underfull \hbox (badness 10000) in paragraph at lines 162--163
 []\OT1/cmr/m/n/10 L'ACF mon-tre que la diff^^Serenciation
  []
 
 
-Underfull \hbox (badness 3396) in paragraph at lines 163--164
+Underfull \hbox (badness 3396) in paragraph at lines 162--163
 \OT1/cmr/m/n/10 saisonni^^Rere ap-pliqu^^See ^^Ra la s^^Serie a bien
  []
 
 
-Overfull \hbox (17.2222pt too wide) in paragraph at lines 155--173
+Overfull \hbox (17.2222pt too wide) in paragraph at lines 154--172
 []$[]$ $[]$ 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 155--173
+Underfull \hbox (badness 10000) in paragraph at lines 154--172
 
  []
 
-[2 </Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig2.png> </Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig3.png>]
+[2 <./fig2.png> <./fig3.png>]
 <fig5.png, id=31, 697.60625pt x 431.6125pt>
 File: fig5.png Graphic file (type png)
 <use fig5.png>
-Package pdftex.def Info: fig5.png  used on input line 176.
+Package pdftex.def Info: fig5.png  used on input line 175.
 (pdftex.def)             Requested size: 266.14978pt x 164.66644pt.
 
-Overfull \hbox (3.11679pt too wide) in paragraph at lines 180--182
+Overfull \hbox (3.11679pt too wide) in paragraph at lines 179--181
 \OT1/cmr/m/n/10 Apr^^Res anal-yse, les per-tur-ba-tions du mod^^Rele sem-blent ho-mosc^^Sedastiques : l'intuition sur la non-variabilit^^Se
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 183--184
+Underfull \hbox (badness 10000) in paragraph at lines 182--186
 
  []
 
-[3 </Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig4.png> </Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig5.png>]
+
+Underfull \hbox (badness 10000) in paragraph at lines 182--186
+
+ []
+
+[3 <./fig4.png> <./fig5.png>]
 <figtemp.jpg, id=37, 1284.8pt x 728.7225pt>
 File: figtemp.jpg Graphic file (type jpg)
 <use figtemp.jpg>
 Package pdftex.def Info: figtemp.jpg  used on input line 189.
 (pdftex.def)             Requested size: 332.68385pt x 188.69614pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 203--206
-
- []
-
-<fig20.png, id=38, 599.841pt x 83.1105pt>
+ [4 <./figtemp.jpg>]
+<fig20.png, id=41, 599.841pt x 83.1105pt>
 File: fig20.png Graphic file (type png)
 <use fig20.png>
 Package pdftex.def Info: fig20.png  used on input line 209.
 (pdftex.def)             Requested size: 443.57848pt x 61.46147pt.
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-[4 </Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/figtemp.jpg>]
 File: fig2.png Graphic file (type png)
 <use fig2.png>
 Package pdftex.def Info: fig2.png  used on input line 229.
 (pdftex.def)             Requested size: 210.69908pt x 111.56447pt.
 
-Overfull \hbox (17.2222pt too wide) in paragraph at lines 227--244
+Overfull \hbox (17.2222pt too wide) in paragraph at lines 227--241
 []$[]$ $[]$ 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 227--244
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 227--244
+[5 <./fig20.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 242--243
 
  []
 
-[5 </Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig20.png>]
 <fig9.png, id=46, 685.56125pt x 418.56375pt>
 File: fig9.png Graphic file (type png)
 <use fig9.png>
-Package pdftex.def Info: fig9.png  used on input line 249.
+Package pdftex.def Info: fig9.png  used on input line 248.
 (pdftex.def)             Requested size: 210.69908pt x 128.64212pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 254--257
+Underfull \hbox (badness 1424) in paragraph at lines 253--256
+\OT1/cmr/m/n/10 cor-riger cela, nous ap-pli-querons un param^^Retre
+ []
+
+
+Underfull \hbox (badness 1127) in paragraph at lines 253--256
+\OT1/cmr/m/n/10 auto-r^^Segressif et de moyenne mo-bile saison-nier
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 253--256
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 254--257
+Underfull \hbox (badness 10000) in paragraph at lines 253--256
 
  []
 
 
-Overfull \hbox (17.2222pt too wide) in paragraph at lines 247--263
+Overfull \hbox (17.2222pt too wide) in paragraph at lines 246--262
 []$[]$ $[]$ 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 247--263
+Underfull \hbox (badness 10000) in paragraph at lines 246--262
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 247--263
+Underfull \hbox (badness 10000) in paragraph at lines 246--262
 
  []
 
 <fig10.png, id=47, 685.56125pt x 418.56375pt>
 File: fig10.png Graphic file (type png)
 <use fig10.png>
-Package pdftex.def Info: fig10.png  used on input line 266.
+Package pdftex.def Info: fig10.png  used on input line 265.
 (pdftex.def)             Requested size: 210.69908pt x 128.64212pt.
 
-Underfull \hbox (badness 2119) in paragraph at lines 271--272
+Underfull \hbox (badness 2119) in paragraph at lines 270--271
 \OT1/cmr/m/n/10 vari-a-tion sig-ni-fica-tives ont ^^Set^^Se capt^^Sees par le
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 271--272
+Underfull \hbox (badness 10000) in paragraph at lines 270--271
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 271--272
+Underfull \hbox (badness 10000) in paragraph at lines 270--271
 
  []
 
 
-Overfull \hbox (17.2222pt too wide) in paragraph at lines 264--276
+Overfull \hbox (17.2222pt too wide) in paragraph at lines 263--275
 []$[]$ $[]$ 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 264--276
+Underfull \hbox (badness 10000) in paragraph at lines 263--275
 
  []
 
 <fig+.png, id=48, 700.6175pt x 398.48875pt>
 File: fig+.png Graphic file (type png)
 <use fig+.png>
-Package pdftex.def Info: fig+.png  used on input line 279.
-(pdftex.def)             Requested size: 332.68385pt x 189.22331pt.
-[6 </Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig9.png> </Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig10.png> </Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig+.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 291--295
+Package pdftex.def Info: fig+.png  used on input line 278.
+(pdftex.def)             Requested size: 288.32329pt x 163.98949pt.
+[6 <./fig9.png> <./fig10.png> <./fig+.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 290--294
 
  []
 
 <fig21.png, id=55, 596.82974pt x 81.906pt>
 File: fig21.png Graphic file (type png)
 <use fig21.png>
-Package pdftex.def Info: fig21.png  used on input line 298.
+Package pdftex.def Info: fig21.png  used on input line 297.
 (pdftex.def)             Requested size: 443.57848pt x 60.87569pt.
-[7 </Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig21.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 312--313
+[7 <./fig21.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 311--312
 
  []
 
 <fig12.png, id=61, 1138.2525pt x 558.28575pt>
 File: fig12.png Graphic file (type png)
 <use fig12.png>
-Package pdftex.def Info: fig12.png  used on input line 318.
+Package pdftex.def Info: fig12.png  used on input line 317.
 (pdftex.def)             Requested size: 332.68385pt x 163.17653pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 323--326
+Underfull \hbox (badness 10000) in paragraph at lines 322--325
 
  []
 
-[8 </Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig12.png>]
+[8 <./fig12.png>]
 <figterm.png, id=67, 1153.30875pt x 573.94424pt>
 File: figterm.png Graphic file (type png)
 <use figterm.png>
-Package pdftex.def Info: figterm.png  used on input line 331.
+Package pdftex.def Info: figterm.png  used on input line 330.
 (pdftex.def)             Requested size: 354.86412pt x 176.59846pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 335--342
+Underfull \hbox (badness 10000) in paragraph at lines 334--341
 
  []
 
-[9 </Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/figterm.png>]
+[9 <./figterm.png>]
 <concl.png, id=72, 700.6175pt x 398.48875pt>
 File: concl.png Graphic file (type png)
 <use concl.png>
-Package pdftex.def Info: concl.png  used on input line 366.
+Package pdftex.def Info: concl.png  used on input line 365.
 (pdftex.def)             Requested size: 354.86412pt x 201.84023pt.
- [10 </Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/concl.png>] (/Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/main.aux)
+ [10 <./concl.png>] (./main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
@@ -1282,14 +1283,14 @@ LaTeX Warning: There were multiply-defined labels.
  ) 
 Here is how much of TeX's memory you used:
  23332 strings out of 474116
- 492569 string characters out of 5743681
- 1938187 words of memory out of 5000000
+ 491527 string characters out of 5743681
+ 1939187 words of memory out of 5000000
  45283 multiletter control sequences out of 15000+600000
  573573 words of font info for 92 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 99i,9n,101p,1114b,369s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 99i,9n,101p,1038b,369s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/mathabx-type1/matha10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/mathabx-type1/matha7.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb>
-Output written on "/Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/main.pdf" (10 pages, 1084564 bytes).
+Output written on main.pdf (10 pages, 1085943 bytes).
 PDF statistics:
  129 PDF objects out of 1000 (max. 8388607)
  65 compressed objects within 1 object stream

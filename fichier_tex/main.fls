@@ -1,9 +1,9 @@
-PWD /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)
+PWD /Users/admin/github/projet_electricite_temperature/fichier_tex
 INPUT /usr/local/texlive/2024/texmf.cnf
 INPUT /usr/local/texlive/2024/texmf-dist/web2c/texmf.cnf
 INPUT /usr/local/texlive/2024/texmf-var/web2c/pdftex/pdflatex.fmt
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/main.tex
-OUTPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/main.log
+INPUT /Users/admin/github/projet_electricite_temperature/fichier_tex/main.tex
+OUTPUT main.log
 INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/base/article.cls
 INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/base/article.cls
 INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/base/size10.clo
@@ -239,10 +239,10 @@ INPUT /usr/local/texlive/2024/texmf-dist/tex/generic/iftex/ifvtex.sty
 INPUT /usr/local/texlive/2024/texmf-dist/tex/generic/iftex/ifvtex.sty
 INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 INPUT /usr/local/texlive/2024/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/main.aux
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/main.aux
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/main.aux
-OUTPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/main.aux
+INPUT ./main.aux
+INPUT ./main.aux
+INPUT main.aux
+OUTPUT main.aux
 INPUT /usr/local/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 INPUT /usr/local/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 INPUT /usr/local/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
@@ -315,86 +315,86 @@ INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/public/mathabx/mathb5.tfm
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/public/mathabx/mathx10.tfm
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/public/mathabx/mathx10.tfm
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/public/mathabx/mathx10.tfm
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig1.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig1.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig1.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig1.png
-OUTPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/main.pdf
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig1.png
+INPUT ./fig1.png
+INPUT ./fig1.png
+INPUT ./fig1.png
+INPUT ./fig1.png
+OUTPUT main.pdf
+INPUT ./fig1.png
 INPUT /usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig2.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig2.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig2.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig2.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig2.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig3.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig3.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig3.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig3.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig3.png
+INPUT ./fig2.png
+INPUT ./fig2.png
+INPUT ./fig2.png
+INPUT ./fig2.png
+INPUT ./fig2.png
+INPUT ./fig3.png
+INPUT ./fig3.png
+INPUT ./fig3.png
+INPUT ./fig3.png
+INPUT ./fig3.png
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmti10.tfm
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig4.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig4.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig4.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig4.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig4.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig5.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig5.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig5.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig5.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig5.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/figtemp.jpg
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/figtemp.jpg
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/figtemp.jpg
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/figtemp.jpg
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/figtemp.jpg
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig20.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig20.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig20.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig20.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig20.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig2.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig2.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig2.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig2.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig9.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig9.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig9.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig9.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig9.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig10.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig10.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig10.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig10.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig10.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig+.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig+.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig+.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig+.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig+.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig21.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig21.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig21.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig21.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig21.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig12.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig12.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig12.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig12.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/fig12.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/figterm.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/figterm.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/figterm.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/figterm.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/figterm.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/concl.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/concl.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/concl.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/concl.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/concl.png
-INPUT /Users/admin/github/projet_electricite_temperature/Modélisation de la consommation électrique et de la température à Tetouan (Maroc)/main.aux
+INPUT ./fig4.png
+INPUT ./fig4.png
+INPUT ./fig4.png
+INPUT ./fig4.png
+INPUT ./fig4.png
+INPUT ./fig5.png
+INPUT ./fig5.png
+INPUT ./fig5.png
+INPUT ./fig5.png
+INPUT ./fig5.png
+INPUT ./figtemp.jpg
+INPUT ./figtemp.jpg
+INPUT ./figtemp.jpg
+INPUT ./figtemp.jpg
+INPUT ./figtemp.jpg
+INPUT ./fig20.png
+INPUT ./fig20.png
+INPUT ./fig20.png
+INPUT ./fig20.png
+INPUT ./fig20.png
+INPUT ./fig2.png
+INPUT ./fig2.png
+INPUT ./fig2.png
+INPUT ./fig2.png
+INPUT ./fig9.png
+INPUT ./fig9.png
+INPUT ./fig9.png
+INPUT ./fig9.png
+INPUT ./fig9.png
+INPUT ./fig10.png
+INPUT ./fig10.png
+INPUT ./fig10.png
+INPUT ./fig10.png
+INPUT ./fig10.png
+INPUT ./fig+.png
+INPUT ./fig+.png
+INPUT ./fig+.png
+INPUT ./fig+.png
+INPUT ./fig+.png
+INPUT ./fig21.png
+INPUT ./fig21.png
+INPUT ./fig21.png
+INPUT ./fig21.png
+INPUT ./fig21.png
+INPUT ./fig12.png
+INPUT ./fig12.png
+INPUT ./fig12.png
+INPUT ./fig12.png
+INPUT ./fig12.png
+INPUT ./figterm.png
+INPUT ./figterm.png
+INPUT ./figterm.png
+INPUT ./figterm.png
+INPUT ./figterm.png
+INPUT ./concl.png
+INPUT ./concl.png
+INPUT ./concl.png
+INPUT ./concl.png
+INPUT ./concl.png
+INPUT main.aux
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb

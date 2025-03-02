@@ -129,7 +129,6 @@ Commençons par décomposer la série temporelle (fig.2) associée à la tempér
     \label{fig:enter-label}
 \end{minipage}
 \begin{minipage}{.5\textwidth}
-    A partir de la décomposition de la série temporelle $st\_temperature$ :
     \begin{itemize}
     \item La tendance semble linéaire : malgré les fluctuations visibles, la période estivale analysée donne l'intuition de températures relativement constantes durant les deux mois sélectionnés.  
     \item Une saisonnalité journalière semble se dessiner : l'intuition derrière cette analyse est que malgré une tendance constante, les températures baissent la nuit avant de remonter en journée (pic haut vers 15, pic bas vers 7h).
@@ -177,11 +176,12 @@ Vérifions alors l'ACF, le partial ACF, la blancheur (test de Box-Ljung) ainsi q
     \caption{ACF, PACF et QQ-plot associés aux résidus du modèle SARIMA(2,0,0)(1,1,1)[24]}
     \label{fig:enter-label}
 \end{figure}
-Selon les deux premiers graphiques, la quasi-totalité des variations significatives ont été captées par le modèle. Le test de Box, qui teste l'hypothèse $\mathcal{H}_0$ \textit{"la série est un bruit blanc"}, vient confirmer cette intuition en montrant que les résidus du modèle sont bien un bruit blanc.\newline
+Selon les deux premiers graphiques, la quasi-totalité des variations significatives ont été captées par le modèle. Le test de Box, qui teste l'hypothèse $\mathcal{H}_0$ \textit{"la série est un bruit blanc"}, est significatif et donc vient confirmer cette intuition en montrant que les résidus du modèle sont bien un bruit blanc.\newline
 Après analyse, les perturbations du modèle semblent homoscédastiques : l'intuition sur la non-variabilité des température moyennes durant ces deux mois viennent confirmer l'analyse, même si les résidus ne sont pas parfaitement homoscédastiques (test de Breuch-Pagan d'heteroscédasticité significatif qui teste l'hypothèse $\mathcal{H}_0$ : \textit{"les résidus sont homoscédastiques"}). De plus, les résidus du modèle ne suivent pas une loi normale : la distribution des résidus reste fortement leptokurtique et asymétrique à droite. 
 
 En réalité, ces deux hypothèses ne seraient nécessaire que pour construire des intervalles de confiance sur les prédictions. Le fait qu'elles ne soient pas vérifiées ne changent en rien la pertinence du modèle trouvé. Comme nous connaissons les températures durant les mois suivants, ces intervalles ne sont pas utiles. A la place, nous avons choisi de tracer la courbe de température les trois premiers jours de septembre et la prédictions sur le même graphe. Ensuite, on calculera le RMSE pour évaluer l'erreur.\newline
-
+\newline
+\\
 Afin de s'assurer de la pertinence du modèle, nous allons le comparer aux modèles conçus par les algorithmes *auto.arima*, configurés en fonction de l'AIC (critère choisi pour sélectionner le modèle optimal en équilibrant l'ajustement aux données et la complexité du modèle, en privilégiant celui avec l'AIC le plus bas.), et au modèle de lissage exponentiel automatique de Holt-Winters car ce dernier est particulièrement adapté aux séries temporelles présentant des tendances et des saisons comme celle-ci. Comparer SARIMA à Holt-Winters permet d’évaluer si une approche fondée sur la décomposition explicite des composantes (tendance et saisonnalité) améliore la prévision. En effet, alors que SARIMA capture les dépendances temporelles à travers des termes autorégressifs et des moyennes mobiles, Holt-Winters met davantage l’accent sur l’évolution progressive des tendances et des variations saisonnières.
 
 \begin{figure}[!h]
@@ -197,11 +197,11 @@ les valeurs dans la période creuse, réagit mal aux chutes abruptes de tempéra
 hauts décroît fortement lors des jours suivants.
 \item Le modèle automatique ARIMA(2,0,0)(2,1,0)[24] (courbe bleu foncé) capture le premier pic de manière similaire au modèle manuel et possède une meilleure adéquation que le modèle manuel lors des chutes abruptes de température. De plus, il est plus précis lors des creux de température. Cependant, il prédit moins bien le premier creux de température et, comme le premier modèle, sa capacité à prédire
 des pics et des variation abruptes de température décroît avec le temps.
-\item Le modèle ETS (M,Ad,A) (courbe pourpe) possède une meilleure précision
+\item Le modèle ETS (M,Ad,A) (courbe pourpe) considère l'erreur multiplicative, la tendance additive et amortie et la saissonalité additive. Il possède une meilleure précision
 dans les creux : il lisse efficacement les variations brutales et ne les surestime pas. Cependant, il sous-estime les trois premiers pics de température (probablement à cause d’une composante saisonnière trop lissée) et sur-estime les quatre derniers pics.
 \end{itemize} 
-Ainsi, le modèle SARIMA manuel serait plus adapté pour les saisonnalités marquées au détriment des changement brusques. Le modèle SARIMA automatique est plus flexible pour les fluctuations rapides mais toujours sujet au sur-ajustement. ETS excelle pour les tendances lissées et les creux, cependant au détriment des pics de température. Pour finir, aucun de nos modèles n’est performant lorsque l’on dépasse le deuxième
-jour.\newline \\
+Ainsi, le modèle SARIMA manuel serait plus adapté pour les saisonnalités marquées au détriment des changement brusques. Le modèle SARIMA automatique est plus flexible pour les fluctuations rapides mais toujours sujet au sur-ajustement. ETS excelle pour les tendances lissées et les creux, cependant au détriment des pics de température. Pour finir, aucun de nos modèles n’est performant lorsque l’on dépasse le deuxième jour.
+\newpage
 Comparons les RMSE pour pouvoir comparer les prédictions des modèles chaque jour.
 \FloatBarrier
 \begin{figure}[!h]
@@ -238,10 +238,9 @@ Commençons par décomposer la série temporelle $st\_conso$ en tendance, partie
     \item une partie résiduelle comprise entre -5000 et 5000 kWh les cinquante premiers jours avec une variance plutôt constante et entre -10000 et 15000 kWh les dix derniers jours (avec une variance qui augmente de jours en jours).
     \end{itemize}
 \end{minipage}
-\newline
-\\
-Le test kpss pour la série non-désaisonnalisée et/ou non différenciée est significatif . On va devoir devoir différencier la série et inclure une différenciation saisonnière qui capteront la partie non-stationnaire de la série (d=1, D=1).\newline
 \newpage
+Le test kpss pour la série non-désaisonnalisée et/ou non différenciée est significatif . On va devoir devoir différencier la série et inclure une différenciation saisonnière qui capteront la partie non-stationnaire de la série (d=1, D=1).\newline
+
 Représentons l'ACF et le partial ACF après avoir appliqué une différentiation et une différentiation saisonnière à la série :
 \FloatBarrier
 \begin{minipage}{.5\textwidth}
@@ -252,7 +251,7 @@ Représentons l'ACF et le partial ACF après avoir appliqué une différentiatio
 \end{minipage}
 \begin{minipage}{.5\textwidth}
     L’ACF et le PACF montrent des pics significatifs à chaque période (tous les 24 pics) montrant ainsi
-    une saisonnalité dans les deux graphes A REFORMULER. Afin de corriger cela, nous appliquerons un paramètre auto-régressif et de moyenne mobile saisonnier d’ordre 1 (P = 1, Q = 1).\newline
+    une saisonnalité dans les deux graphes. Afin de corriger cela, nous appliquerons un paramètre auto-régressif et de moyenne mobile saisonnier d’ordre 1 (P = 1, Q = 1).\newline
     De plus, on voit que le premier pic du PACF est significatif. Ainsi, nous allons appliquer un terme auto-régressif d’ordre p = 1.\newline\\    
 \end{minipage}
 \newline
@@ -276,20 +275,20 @@ Comparons le modèle ainsi construit à celui construit automatiquement grâce �
 \FloatBarrier
 \begin{figure}[!h]
     \centering
-    \includegraphics[width=0.75\linewidth]{fig+.png}
+    \includegraphics[width=0.65\linewidth]{fig+.png}
     \caption{Comparaison des modèles de prévision de la consommation électrique}
     \label{fig:enter-label}
 \end{figure}
 Le graphique nous montre un évènement spécial lors du premier jour, évènement absolument pas capté parles modèles de prévisions. Selon ce graphique, on voit que les modèles SARIMA manuel et automatique sont très similaires dans
 leurs estimations. 
 \begin{itemize}
-    \item Les pics de basses consommations (aux alentours de midi) sont bien estimés lors des deux premiers jours mais de plus plus en plus sous-estimés ensuite. Ils estiment bien les pics hauts (aux alentours de 19h) à partir du jour 2 jusqu'au jour 4 et captent davantage les variations intermédiaires (chute partielle de consommation avant atteinte du pic).\newline
+    \item Modèles SARIMA : Les pics de basses consommations (aux alentours de midi) sont bien estimés lors des deux premiers jours mais de plus plus en plus sous-estimés ensuite. Ils estiment bien les pics hauts (aux alentours de 19h) à partir du jour 2 jusqu'au jour 4 et captent davantage les variations intermédiaires (chute partielle de consommation avant atteinte du pic).\newline
 Les variations abruptes sont aussi bien estimées. Cependant, ces deux modèles tendent à sous-estimer les valeurs réelles avec le temps, toute heure confondue.
-    \item Le modèle ETS est globalement meilleur que les modèles SARIMA pour estimer les creux de consommation, mais il a tendance à sur-estimer les pics de midi et de 19h, surtout lors des premiers jours. Aussi, malgré une moins bonne estimation des variations intermédiaires et des quatre premiers pics de midi comparé aux deux autres modèles, ETS estime mieux et de manière plus stable la consommation, là où les
+    \item Modèle ETS (M, Ad, M) : En considérant l'erreur et la saissonalité multiplicative avec la trend additive et amortie, la Le modèle ETS est globalement meilleur que les modèles SARIMA pour estimer les creux de consommation, mais il a tendance à sur-estimer les pics de midi et de 19h, surtout lors des premiers jours. Aussi, malgré une moins bonne estimation des variations intermédiaires et des quatre premiers pics de midi comparé aux deux autres modèles, ETS estime mieux et de manière plus stable la consommation, là où les
 modèles SARIMA perdent fortement en précision dans le temps.
 \end{itemize}
-Les pics journaliers montrent qu’ETS surestime mais suit la tendance globale, tandis que les modèles SARIMA
-divergent. A partir du jour 6, les modèles SARIMA sous-estiment fortement la consommation en particulier pendant les creux nocturnes et les pics de midi. \newline
+A court terme, les modèles SARIMA permettent une meilleure estimation des pics de consommation et des periodes creuses, tandis que le modèle ETS a tendance a surestoimer,, sauf lors des pics bas. A moyen et long terme, les pics journaliers montrent qu’ETS surestime moins et suit la tendance globale, tandis que les modèles SARIMA
+divergent dans le temps. A partir du jour 6, les modèles SARIMA sous-estiment fortement la consommation en particulier pendant les creux nocturnes et les pics de midi. \newline
 Ainsi, le modèle ETS est mieux adapté pour les prévisions nocturnes et au long terme alors que les modèles SARIMA prédit mieux la consommation en journée de J+1 à J+4.\newline \\
 On peut comparait les prédictions des différents modèles grâce au RMSE calculé quotidiennement pendant une semaine. 
 \FloatBarrier
@@ -358,7 +357,7 @@ Le SARIMA(1,1,0)(1,1,1)[24] manuel est retenu pour la prévision de la consommat
     \item Limitations à long terme : Au-delà de J+4, tous les modèles voient leur erreur augmenter, mais le SARIMA reste préférable pour son interprétabilité et sa structure paramétrique claire.
 \end{itemize}
 \subsection*{Corrélation température-consommation}
-A TOI DE REMPLIR
+Bien qu'une corrélation modérée ($R^2 = 33\%$), existe entre la consommation et la température décalée de 3 heures, les résidus du SARIMA ne présentent aucune dépendance significative avec cette variable ($r = 8.45*10^-5$). Cela suggère que le modèle SARIMA intègre déjà indirectement l'effet de la température via ses composantes autorégressives et saisonnières, rendant superflu l'ajout d'une régresseur externe (SARIMAX).
 \subsection*{Synthèse des choix}
 \FloatBarrier
 \begin{figure}[!h]
@@ -370,9 +369,9 @@ A TOI DE REMPLIR
 
 \begin{itemize}
     \item Température : Le SARIMA manuel est retenu pour sa capacité à capter le pic-saissonier à j+1, la prévision des pics etant plus important que celle des températures en heures creuses (où ETS est + puissant) dans le cadre de notre analyse.
-    \item Consommation : Le SARIMA manuel est privilégié pour les prévisions à J+1 à J+4, tandis qu'une approche hybride (recalage quotidien du modèle) serait nécessaire au-delà.
+    \item Consommation : Le SARIMA manuel est privilégié pour les prévisions à J+1 à J+4 (fournit de meilleures estiamtions en moyenne avec un AIC très simmilaire au modèle automatique), tandis qu'une approche hybride (recalage quotidien du modèle) serait nécessaire au-delà.
 \end{itemize}
 
 
-Cette analyse souligne l'importance d'arbitrer entre complexité et interprétabilité, et confirme que les modèles SARIMA, bien paramétrés, restent pertinents pour des séries présentant des saisonnalités marquées et des tendances non linéaires.
+Cette analyse souligne l'importance d'arbitrer entre complexité et interprétabilité, et confirme que les modèles SARIMA, bien paramétrés, restent pertinents pour des séries présentant des saisonnalités et des tendances marquées.
 \end{document}
